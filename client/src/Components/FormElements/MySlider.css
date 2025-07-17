@@ -1,0 +1,10 @@
+.MySlider{
+    display: flex;
+    justify-content: space-around;
+    gap: 0.5rem;
+    padding: 1rem;
+}
+
+.slid-inp{
+    width: 70%;
+}

@@ -1,0 +1,28 @@
+.onegole-chart {
+    display: flex;
+    justify-content: space-evenly;
+    gap: 1rem;
+    margin: 1rem;
+}
+
+.onegole-btn {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+/* Responsive styles */
+@media (max-width: 850px) {
+    .onegole-chart {
+        flex-direction: column;
+        align-items: center;
+        margin: 0.5rem 0;
+        gap: 1rem;
+    }
+    .onegole-btn {
+        align-items: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+}

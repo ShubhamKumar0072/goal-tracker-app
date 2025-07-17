@@ -1,0 +1,26 @@
+.DayPicker{
+    margin: 1rem;
+    padding-left: 0.5rem;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.DayPicker>p{
+    font-size: 23px;
+}
+.DayPicker>input{
+    display: none;
+}
+
+.DayPicker>label{
+    font-size: 23px;
+    background-color: #E6E6FA;
+    padding: 0.5rem;
+    border-radius: 15px;
+}
+
+.DayPicker>label.selected {
+    background: rgb(99, 3, 99);
+    color: #fff;
+}

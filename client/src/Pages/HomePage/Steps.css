@@ -1,0 +1,12 @@
+.Steps{
+    text-align: center;
+    margin: 1rem;
+}
+
+.step{
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}

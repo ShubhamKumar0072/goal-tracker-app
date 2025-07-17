@@ -1,0 +1,23 @@
+.BarGraph{
+    display: flex;
+    gap: 1rem;
+    margin: "0 auto";
+}
+.graph-btn{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    padding: 1rem;
+    padding-bottom: 3.5rem;
+}
+
+@media (max-width: 850px) {
+    .BarGraph{
+        flex-direction: column;
+        margin-right: 1rem;
+    }
+    .graph-btn{
+        flex-direction: row; 
+        padding-bottom: 1rem;
+    }
+}

@@ -1,0 +1,8 @@
+.nav-link{
+    text-decoration: none;
+    color: black;
+    border: 2px solid black;
+    font-size: 22px;
+    padding: 0.5rem;
+    border-radius: 25px;
+}

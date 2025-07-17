@@ -1,0 +1,30 @@
+.TextBox{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+}
+.box-lab{
+    font-size: 23px;
+    padding-left: 0.2rem;
+}
+.box-inp{
+    height: 40px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    font-size: 20px;
+    border: none;
+    border-radius: 20px;
+    background-color: #E6E6FA;
+}
+
+.TextBox {
+  flex: 1 1 180px;
+  min-width: 150px;
+}
+
+@media (max-width: 550px) {
+  .TextBox {
+  flex: none;
+}
+}

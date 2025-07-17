@@ -1,0 +1,13 @@
+.OneGoalCalender .react-calendar__navigation {
+    display: block;
+}
+
+.OneGoalCalender .react-calendar__navigation__label {
+    pointer-events: none;
+    cursor: default;
+}
+
+.OneGoalCalender .react-calendar__navigation__prev2-button,
+.OneGoalCalender .react-calendar__navigation__next2-button {
+    display: none;
+}

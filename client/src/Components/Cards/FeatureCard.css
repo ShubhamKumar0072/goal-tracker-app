@@ -1,0 +1,24 @@
+.FeatureCard{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1rem;
+    margin-top: 1.5rem;
+    justify-content: space-around;
+}
+.feture-text{
+    width: 300px;
+}
+
+.feture-img{
+    height: 220px;
+}
+
+@media (max-width: 850px) {
+    .FeatureCard{
+        flex-wrap: wrap;
+    }
+    .feture-img{
+        height: 180px;
+    }
+}

@@ -1,0 +1,27 @@
+body, html {
+  height: 100%;
+  margin: 0;
+  background-color: #FAF9F6;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1; /* This makes main take up all available space */
+}
+
+h1,h2,h3,p{
+  color: #333333;
+}
+
+.recharts-wrapper:focus,
+.recharts-responsive-container:focus,
+.recharts-surface:focus,
+.recharts-bar-rectangle:focus {
+    outline: none !important;
+    border: none !important;
+}
