@@ -4,8 +4,7 @@ import img1 from "./../../assets/img1.svg"
 import { FeatureCard } from "../../Components/Cards/FeatureCard";
 import HomeTop from "./HomeTop";
 import Steps from "./Steps";
-import fetchAPI from "../../../util";
-import { useEffect } from "react";
+import useFetch from "../../hooks/useFetch";
  
 const features = [
     {
@@ -26,18 +25,20 @@ const features = [
 ];
 
 export default function Home(){
-
-    useEffect(()=>{
-        let fun = async()=>{
-            let data = await fetchAPI("/api");
-            return data;
-        }
-        fun();
-    },[])
+    
+    const { data, loading, error } = useFetch("/api");
+    if (loading) return(<h1>Lodding</h1>);
+    if (error) return (<h1>{error.message}</h1>)
+    
 
     return(
         <div>
             <HomeTop/>
+
+            {data?.fruits?.map((fruit, idx) => (
+                <p key={idx}>{fruit}</p>
+            ))}
+
             {features.map((feature, idx) => (
                 <FeatureCard
                     key={idx}

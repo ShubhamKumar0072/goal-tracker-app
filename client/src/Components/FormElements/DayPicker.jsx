@@ -1,23 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./DayPicker.css";
-// filepath: c:\1.My Files\Programing\Projects\gole-tracker-app\client\src\Components\FormElements\DayPicker.jsx
 
-const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+const daysList = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 
-export default function DayPicker() {
+export default function DayPicker({ onSelectDays }) {
   const [selected, setSelected] = useState(Array(7).fill(false));
 
+  // Callback inside useEffect (safe and runs only when `selected` changes)
+  useEffect(() => {
+    if (typeof onSelectDays === "function") {
+      const activeDays = daysList.filter((_, i) => selected[i]);
+      onSelectDays(activeDays);
+    }
+  }, [selected]); // Only trigger when selected days change
+
   function handleLabelClick(idx) {
-    setSelected(sel => {
-      const copy = [...sel];
-      copy[idx] = !copy[idx];
-      return copy;
+    setSelected(prev => {
+      const updated = [...prev];
+      updated[idx] = !updated[idx];
+      return updated;
     });
   }
 
   return (
     <div className="DayPicker">
-      {days.map((day, idx) => (
+      {daysList.map((day, idx) => (
         <React.Fragment key={day}>
           <input
             type="checkbox"
@@ -32,7 +39,7 @@ export default function DayPicker() {
             className={selected[idx] ? "selected" : ""}
             onClick={() => handleLabelClick(idx)}
           >
-            {day}
+            {day.toUpperCase()}
           </label>
         </React.Fragment>
       ))}

@@ -7,61 +7,103 @@ import "./GoalForm.css"
 import { useState } from "react";
 export default function GoalForm() {
 
-  let [formData,setFormData] = useState({
-    goalName:"",
-    subLine:"",
-    desc:"",
-    diff:5,
-    totalDays:"",
-    strDate:""
+
+
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    const today = new Date();
+    const chosenStartDate = new Date(formData.startDate);
+
+    // Validation: Start date must be in the future
+    if (chosenStartDate <= today) {
+      alert("Start date must be later than today.");
+      return;
+    }
+
+    if (formData.days.length === 0) {
+      alert("Please select at least one working day.");
+      return;
+    }
+    const processedData = {
+      ...formData,
+      totalDays: Number(formData.totalDays),
+      startDate: new Date(formData.startDate),
+      isComplete: false
+    };
+
+    console.log("Processed data:", processedData);
+
+    // Optionally send to backend
+    // axios.post("/api/goals", processedData)
+    //   .then(...)
+  }
+
+
+  let [formData, setFormData] = useState({
+    goalName: "",
+    subLine: "",
+    desc: "",
+    diff: 5,
+    totalDays: "",
+    startDate: "",
+    days: []
   });
 
-  function handel(event){
+  function handel(event) {
     let key = event.target.name;
     let val = event.target.value;
-    setFormData((currData)=>{
-      if(key=="diff"){
+    setFormData((currData) => {
+      if (key == "diff") {
         currData[key] = Number(val);
-      }else{
+      } else {
         currData[key] = val;
       }
-      return {...currData};
+      return { ...currData };
     });
   }
-  
+
+  function handleDays(selectedDays) {
+    setFormData(curr => ({
+      ...curr,
+      days: selectedDays
+    }));
+  }
+
   return (
     <div className="GoalForm">
       <div className="main-form">
-        <h2>Create Your Gole</h2>
-        <form action="">
+        <h2>Create Your Goal</h2>
+        <form action="" onSubmit={handleSubmit}>
           <div className="goal-form-top">
-            <TextBox placeholder="Running" type="text" lable="Goal Name" val={formData.goalName} handel={handel}  name="goalName" id="goalName" />
-            <TextBox placeholder="Faster then Ever" type="text" lable="Sub Line" val={formData.subLine} handel={handel} name="subLine" id="subLine" />
+            <TextBox placeholder="Running" type="text" lable="Goal Name" val={formData.goalName} handel={handel} name="goalName" id="goalName" required />
+            <TextBox placeholder="Faster then Ever" type="text" lable="Sub Line" val={formData.subLine} handel={handel} name="subLine" id="subLine" required />
           </div>
-          <TextArea placeholder="Add Brief Description" lable="Description" val={formData.desc} handel={handel} name="desc" id = "desc" />
-          <MySlider lable="Difficulty Level" name="diff" val={formData.diff} id="diff" handel={handel} />
+          <TextArea placeholder="Add Brief Description" lable="Description" val={formData.desc} handel={handel} name="desc" id="desc" required />
+          <MySlider lable="Difficulty Level" name="diff" val={formData.diff} id="diff" handel={handel} required />
           <div className="goal-form-time">
-            <TextBox placeholder="30" type="number" lable="Total Days" val={formData.totalDays} handel={handel} id="totalDays" name="totalDays" />
-            <TextBox type="date" lable="Starting Day" val={formData.strDate} handel={handel} name="strDate" id ="strDate" />
+            <TextBox placeholder="30" type="number" lable="Total Days" val={formData.totalDays} handel={handel} id="totalDays" name="totalDays" required />
+            <TextBox type="date" lable="Starting Day" val={formData.startDate} handel={handel} name="startDate" id="startDate" required />
           </div>
           <p style={{ fontSize: "23px", marginLeft: "1rem" }}>Select Working Days</p>
-          <DayPicker />
-          <div style={{display:"flex",justifyContent:"center"}}>
-          <Button
-            variant="contained"
-            sx={{
-              margin:"1rem",
-              display: "flex",
-              alignItems: "center",
-              backgroundColor: "#1C2A3A",
-              width: 100,
-              height: 40,
-              fontSize: 15,
-              borderRadius: 2
-            }}
-          >
-            Subbmit
-          </Button>
+          <DayPicker onSelectDays={handleDays} />
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <Button
+              variant="contained"
+              type="submit"
+              sx={{
+                margin: "1rem",
+                display: "flex",
+                alignItems: "center",
+                backgroundColor: "#1C2A3A",
+                width: 100,
+                height: 40,
+                fontSize: 15,
+                borderRadius: 2
+              }}
+            >
+              Submit
+            </Button>
           </div>
         </form>
       </div>

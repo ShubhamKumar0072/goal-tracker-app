@@ -1,5 +1,5 @@
 import "./MySlider.css"
-export default function MySlider({val,handel,name,id,lable}){
+export default function MySlider({val,handel,name,id,lable,required}){
     return(
         <div className="MySlider">
             <label className="box-lab" htmlFor={id}>{lable}</label>
@@ -12,6 +12,7 @@ export default function MySlider({val,handel,name,id,lable}){
                 onChange={handel}
                 id={id}
                 name={name}
+                required = {required}
             />
         </div>
     )

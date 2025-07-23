@@ -8,17 +8,8 @@ import MyGoal from './Pages/MyGoal/MyGoal'
 import OneGoal from './Pages/OneGoal/OneGoal'
 import GoalForm from './Pages/GoalForm/GoalForm'
 
-import { useEffect } from 'react';
-import axios from "axios";
-
-import fetchAPI from '../util'
 
 function App() {
-
-
-  useEffect(()=>{
-    fetchAPI("/api");
-  },[]);
 
   return (
     <Router>

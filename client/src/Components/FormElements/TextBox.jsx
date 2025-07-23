@@ -1,5 +1,5 @@
 import "./TextBox.css"
-export default function TextBox({type,placeholder,val,handel,id,lable,name}){
+export default function TextBox({type,placeholder,val,handel,id,lable,name,required}){
     return(
         <div className="TextBox">
             <label className="box-lab" htmlFor={id}>{lable}</label>
@@ -11,6 +11,7 @@ export default function TextBox({type,placeholder,val,handel,id,lable,name}){
                 onChange={handel}
                 id={id}
                 name={name}
+                required = {required}
             />
         </div>
     )
