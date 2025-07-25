@@ -17,19 +17,21 @@ const data = [
 
 const TinyBarChart = () => {
   return (
-    <ResponsiveContainer width={220} height={100} >
-      <BarChart
-        layout="vertical"
-        data={data}
-        margin={{ top: 5, right: 15, left: 80, bottom: 5 }}
-      >
-        <XAxis type="number" hide />
-        <YAxis type="category" dataKey="name" hide />
-        <Bar dataKey="value" fill="#8884d8" barSize={12} radius={[3, 3, 3, 3]} >
-          <LabelList dataKey="name" position="left" style={{ fill: 'black', fontSize: 12 }} />
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
+    <div style={{width:220, height:100}}>
+      <ResponsiveContainer width="100%" height="100%" >
+        <BarChart
+          layout="vertical"
+          data={data}
+          margin={{ top: 5, right: 15, left: 80, bottom: 5 }}
+        >
+          <XAxis type="number" hide />
+          <YAxis type="category" dataKey="name" hide />
+          <Bar dataKey="value" fill="#8884d8" barSize={12} radius={[3, 3, 3, 3]} >
+            <LabelList dataKey="name" position="left" style={{ fill: 'black', fontSize: 12 }} />
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
 

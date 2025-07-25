@@ -25,20 +25,9 @@ const features = [
 ];
 
 export default function Home(){
-    
-    const { data, loading, error } = useFetch("/api");
-    if (loading) return(<h1>Lodding</h1>);
-    if (error) return (<h1>{error.message}</h1>)
-    
-
     return(
         <div>
             <HomeTop/>
-
-            {data?.fruits?.map((fruit, idx) => (
-                <p key={idx}>{fruit}</p>
-            ))}
-
             {features.map((feature, idx) => (
                 <FeatureCard
                     key={idx}

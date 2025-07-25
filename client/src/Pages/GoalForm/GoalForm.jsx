@@ -3,24 +3,27 @@ import MySlider from "../../Components/FormElements/MySlider"
 import TextArea from "../../Components/FormElements/TextArea"
 import TextBox from "../../Components/FormElements/TextBox"
 import Button from '@mui/material/Button';
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./GoalForm.css"
 import { useState } from "react";
 export default function GoalForm() {
 
+  const navigate = useNavigate();
 
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
+    // Validation: Start date must be in the future
     const today = new Date();
     const chosenStartDate = new Date(formData.startDate);
-
-    // Validation: Start date must be in the future
     if (chosenStartDate <= today) {
       alert("Start date must be later than today.");
       return;
     }
 
+    //Days should be selected
     if (formData.days.length === 0) {
       alert("Please select at least one working day.");
       return;
@@ -32,13 +35,16 @@ export default function GoalForm() {
       isComplete: false
     };
 
-    console.log("Processed data:", processedData);
+    //console.log("Processed data:", processedData);
 
-    // Optionally send to backend
-    // axios.post("/api/goals", processedData)
-    //   .then(...)
+    try {
+      const response = await axios.post("http://localhost:8080/goals", processedData);
+      console.log("Success:", response.data);
+      navigate("/goals");
+    } catch (error) {
+      console.error("Error submitting goal:", error);
+    }
   }
-
 
   let [formData, setFormData] = useState({
     goalName: "",

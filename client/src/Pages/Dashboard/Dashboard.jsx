@@ -16,7 +16,7 @@ export default function Dashboard(){
     return(
         <div className="Dashboard">
             <div className="Dashboard-card">
-                <DashCard title="Todays Task" text = {text1} img={img6} bc = "#D6F0FF" onClick={()=>navigate("/task")}/>
+                <DashCard title="Todays Task" text = {text1} img={img6} bc = "#D6F0FF" onClick={()=>navigate("/tasks")}/>
                 <DashCard title="My Goals" text = {text2} img={img7} bc = "#FFE9D6" onClick={()=>navigate("/goals")} />
             </div>
 
