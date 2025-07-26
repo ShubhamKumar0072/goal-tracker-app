@@ -21,6 +21,7 @@ const goalSchema = new Schema({
     diff:{
         type:Number,
         required:true,
+        default:5,
         min:1,
         max:10
     },

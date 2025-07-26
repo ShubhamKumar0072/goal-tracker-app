@@ -12,27 +12,23 @@ async function main() {
 }
 
 const taskforDay = new Task({
-    taskDate:new Date("2026-03-12"),
-    task:[
+    taskDate:new Date("2025-07-28"),
+    tasks:[
         {
             taskName:"Wake up in Mornig",
-            diff:5,
-            disc:"Have to Wake Up in 4:30 AM for work"
+            diff:5
         },
         {
             taskName:"Eate Healthy",
-            diff:4,
-            disc:"Improving metabolism is nessasary"
+            diff:4
         },
         {
             taskName:"Running",
-            diff:8,
-            disc:"Runnig should be at morning is important"
+            diff:8
         },
         {
             taskName:"Sleep Early",
-            diff:4,
-            disc:"Go to bed at 10:30 PM or less then that"
+            diff:4
         },   
     ]
 });
@@ -44,7 +40,6 @@ Task.deleteMany({})
 })
 .then(()=>{
     console.log("Task saved");
-    mongoose.connection.close();
 })
 .catch((error) => {
     console.error("Error while updating goals:", error);
