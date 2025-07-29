@@ -26,7 +26,7 @@ async function addNewTask(date, taskName, diff, goalId) {
       // Append to tasks array
       existingTaskDoc.tasks.push(newTask);
       await existingTaskDoc.save();
-      console.log("Task added to existing document");
+      //console.log("Task added to existing document");
     } else {
       // Create new document
       const newTaskDoc = new Task({
@@ -34,7 +34,7 @@ async function addNewTask(date, taskName, diff, goalId) {
         tasks: [newTask]
       });
       await newTaskDoc.save();
-      console.log("New task document created");
+      //console.log("New task document created");
     }
   } catch (error) {
     console.error("Error adding task:", error);

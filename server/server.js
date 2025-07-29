@@ -5,7 +5,9 @@ const mongoose = require("mongoose");
 const Task = require("./models/task");
 const Goal = require("./models/goal");
 const addNewTask = require("./util/newTask");
-const deleteTaskByGoal = require("./util/deleteTask");
+const {deleteTaskByGoal,deleteTaskById} = require("./util/deleteTask");
+
+
 
 const corsOption = {
   origin: ["http://localhost:5173"]
@@ -46,7 +48,7 @@ app.post("/goals", async (req, res) => {
       const dayName = daysOfWeek[currDate.getDay()];
 
       if (req.body.days.includes(dayName)) {
-        console.log(`Scheduling task on: ${dayName}`);
+        //console.log(`Scheduling task on: ${dayName}`);
         await addNewTask(currDate, req.body.goalName, req.body.diff, newGoal._id);
       }
     }
@@ -66,6 +68,7 @@ app.get("/goals/:id", async (req, res) => {
   res.send(goal);
 })
 
+//Delete a Goal
 app.delete("/goals/:id", async (req, res) => {
   const daysOfWeek = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
   try {
@@ -97,6 +100,58 @@ app.delete("/goals/:id", async (req, res) => {
   }
 });
 
+
+//Show a Task
+app.get("/tasks", async (req, res) => {
+    try {
+        //console.log(req.query.date);
+        const date = new Date(req.query.date);
+        const taskDoc = await Task.findOne({ taskDate: date });
+        //console.log("Task Data : ",taskDoc);
+        res.send(taskDoc);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to fetch tasks" });
+    }
+});
+
+//Add a new task
+app.post("/tasks",async(req,res)=>{
+  try{
+    //console.log("arrived Date = ",req.query.date);
+    const date = new Date(req.query.date);
+    // const taskName = req.body.taskName;
+    // console.log(task);
+    addNewTask(date, req.body.taskName, req.body.diff);
+    res.status(200).json({ message: "Task Added successfully" });
+  }catch(err){
+    res.status(500).json({error: "Failed to add task"});
+  }
+})
+
+
+
+//Delete a Task
+app.delete("/tasks/:id", async (req, res) => {
+  try {
+    const { id: taskId } = req.params;
+    const { date } = req.query;
+
+    if (!date || !taskId) {
+      return res.status(400).json({ error: "Missing date or taskId in request." });
+    }
+
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate)) {
+      return res.status(400).json({ error: "Invalid date format." });
+    }
+
+    await deleteTaskById(parsedDate, taskId);
+    return res.status(200).json({ message: `Task ${taskId} deleted successfully.` });
+  } catch (error) {
+    console.error("API error deleting task:", error);
+    return res.status(500).json({ error: "Internal server error." });
+  }
+});
 
 
 

@@ -14,7 +14,6 @@ export default function OneGoal() {
     const goalId = location.state?.goalId;
     const navigate = useNavigate();
 
-
     const { data, loading, error } = useFetch(`/goals/${goalId}`);
     if (loading) return (<h1>Looding ....</h1>);
     if (error) return (<h1>Error : {error.message} </h1>);
