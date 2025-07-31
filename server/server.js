@@ -154,9 +154,52 @@ app.delete("/tasks/:id", async (req, res) => {
 });
 
 
+//Edit Task
+app.put("/tasks", async (req, res) => {
+  try {
+    const { date } = req.query;
+    const { tasks } = req.body;
 
+    if (!date || !Array.isArray(tasks)) {
+      return res.status(400).json({ error: "Missing date or tasks array." });
+    }
 
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate)) {
+      return res.status(400).json({ error: "Invalid date format." });
+    }
 
+    // Validate each task object
+    for (const task of tasks) {
+      if (
+        typeof task.taskName !== "string" ||
+        typeof task.isComplete !== "boolean" ||
+        typeof task.diff !== "number" ||
+        task.diff < 1 || task.diff > 10
+      ) {
+        return res.status(400).json({ error: "Invalid task format or values." });
+      }
+    }
+
+    // Find or create the task document
+    let taskDoc = await Task.findOne({ taskDate: parsedDate });
+
+    if (!taskDoc) {
+      taskDoc = new Task({
+        taskDate: parsedDate,
+        tasks: tasks
+      });
+    } else {
+      taskDoc.tasks = tasks;
+    }
+
+    await taskDoc.save();
+    res.status(200).json({ message: "Tasks updated successfully", tasks: taskDoc.tasks });
+  } catch (error) {
+    console.error("Error updating tasks:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
 
 
 

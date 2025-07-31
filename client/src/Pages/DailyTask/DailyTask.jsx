@@ -24,6 +24,7 @@ export default function DailyTask() {
     const [date, setDate] = useState(new Date());
     const [data, setData] = useState(null);
 
+
     //Function to access Data
     async function fetchTasks() {
         try {
@@ -72,6 +73,47 @@ export default function DailyTask() {
         }
     }
 
+    //Submit task form
+    function taskHandelEdit(taskId, newStatus) {
+        setData(prevData => {
+            if (!prevData || !prevData.tasks) return prevData;
+
+            const updatedTasks = prevData.tasks.map(task =>
+                task._id === taskId ? { ...task, isComplete: newStatus } : task
+            );
+
+            return { ...prevData, tasks: updatedTasks };
+        });
+    }
+
+    //When Submit Clicked
+    async function handleSubmitAll(e) {
+        e.preventDefault();
+
+        if (!data?.tasks || data.tasks.length === 0) {
+            console.warn("No tasks to submit.");
+            return;
+        }
+
+        const dateUTC = toUTCStartOfDay(date).toISOString();
+
+        try {
+            const response = await axios.put(`http://localhost:8080/tasks?date=${dateUTC}`, {
+                tasks: data.tasks.map(task => ({
+                    taskName: task.taskName,
+                    diff: task.diff,
+                    goal: task.goal || null,
+                    isComplete: task.isComplete
+                }))
+            });
+
+            console.log("Tasks updated successfully:", response.data);
+            fetchTasks(); // Refresh the task list after update
+        } catch (error) {
+            console.error("Error updating tasks:", error);
+        }
+    }
+
 
 
     return (
@@ -90,14 +132,17 @@ export default function DailyTask() {
                                 isDone={task.isComplete}
                                 date={toUTCStartOfDay(date)}
                                 goal={task.goal}
-                                onDelete={() => fetchTasks()} // refresh after delete
+                                onDelete={() => fetchTasks()}
+                                onEdit={taskHandelEdit}
                             />
+
                         ))
                     ) : (
                         <p>No tasks found for this date.</p>
                     )}
                     <Button
                         variant="contained"
+                        onClick={handleSubmitAll}
                         sx={{
                             display: "flex",
                             alignItems: "center",
