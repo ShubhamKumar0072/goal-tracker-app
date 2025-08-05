@@ -36,7 +36,7 @@
     pointer-events: all;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 890px) {
     .DailyTask{
         flex-direction: column;
         align-items: center;

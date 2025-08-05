@@ -20,6 +20,9 @@ const taskSchema = new Schema({
                 min:1,
                 max:10
             },
+            // disc:{
+            //     type: String
+            // },
             goal: {
                 type: Schema.Types.ObjectId,
                 ref: "Goal"

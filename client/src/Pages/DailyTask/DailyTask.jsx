@@ -2,6 +2,7 @@ import Calendar from 'react-calendar';
 import Button from '@mui/material/Button';
 import useFetch from '../../hooks/useFetch';
 import TextBox from '../../Components/FormElements/TextBox';
+import TextArea from '../../Components/FormElements/TextArea';
 import MySlider from '../../Components/FormElements/MySlider';
 import 'react-calendar/dist/Calendar.css';
 import axios from 'axios';
@@ -45,6 +46,10 @@ export default function DailyTask() {
     //New Task Form
     const [newTask, setNewTask] = useState("");
     const [diff, setDiff] = useState(5);
+    const [desc,setDesc] = useState("");
+    function handelDesc(event){
+        setDesc(event.target.value);
+    }
     function handleNewTask(event) {
         setNewTask(event.target.value);
     }
@@ -59,6 +64,7 @@ export default function DailyTask() {
         let data = {
             taskName: newTask,
             diff: diff,
+            desc : desc,
             isComplete: false,
         }
         try {
@@ -120,8 +126,8 @@ export default function DailyTask() {
         <div className="DailyTask">
             <div className='taskForm'>
                 <form action="">
-                    <h1>
-                        Submit before 02:00 AM{date ? ` || ${date.toLocaleDateString()}` : ''}
+                    <h1 style={{textAlign:"center"}}>
+                        {date ? `Date : ${date.toLocaleDateString()}` : ''}
                     </h1>
                     {data?.tasks?.length > 0 ? (
                         data.tasks.map((task) => (
@@ -160,6 +166,7 @@ export default function DailyTask() {
                 <form action="" className='new-taskForm' onSubmit={handleTaskAdd}>
                     <TextBox placeholder="Running" type="text" lable="New Task Name" val={newTask} handel={handleNewTask} name="taskName" id="newTask" required />
                     <MySlider lable="Difficulty Level" name="diff" val={diff} id="diff" handel={handelDiff} required />
+                    {/* <TextArea lable="Discription" name = "TaskDsc" val={desc} id="desc" handel={handelDesc}/> */}
                     <Button
                         variant="contained"
                         type='submit'

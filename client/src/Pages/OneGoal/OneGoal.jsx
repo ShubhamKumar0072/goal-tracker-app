@@ -49,6 +49,7 @@ export default function OneGoal() {
                         fontSize: 15,
                         borderRadius: 2
                     }}
+                    onClick={() => navigate(`/goal-edit/${goalId}`)}
                 >
                     Edit
                 </Button>

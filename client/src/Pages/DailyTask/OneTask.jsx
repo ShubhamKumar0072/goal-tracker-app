@@ -3,7 +3,7 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
 
-export default function OneTask({ onEdit, label, isDone, taskId, date, goal, onDelete }) {
+export default function OneTask({ onEdit, label,desc, isDone, taskId, date, goal, onDelete }) {
     async function handleDeleteClick() {
         try {
             const response = await axios.delete(`http://localhost:8080/tasks/${taskId}?date=${new Date(date).toISOString()}`);

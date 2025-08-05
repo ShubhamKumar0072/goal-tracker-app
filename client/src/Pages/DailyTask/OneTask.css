@@ -6,23 +6,37 @@
     border-radius: 15px;
     margin: 1rem;
     padding: 0.5rem;
-    min-width: 300px;
+    min-width: 400px;
+
 }
 
-.task-box{
-    display: flex;
-    align-items: center;
+.task-box {
+  display: flex;
+  align-items: flex-start; /* Align items to top */
+  gap: 0.75rem; /* Add spacing between checkbox and label */
+  flex: 1;
 }
 
-.OneTask  input[type="checkbox"] {
+.OneTask input[type="checkbox"] {
   width: 24px;
   height: 24px;
-  cursor: pointer;
+  flex-shrink: 0; /* Prevent checkbox from shrinking */
+  margin-top: 4px; /* Optional: fine-tune vertical alignment */
 }
 
-.OneTask  label{
-    font-size: 25px;
-    margin-left: 1rem;
-    cursor: pointer;
+.OneTask label {
+  font-size: 25px;
+  line-height: 1.2;
+  word-break: break-word; /* Prevent overflow */
+  flex: 1; /* Allow label to take remaining space */
 }
+
+@media (max-width: 550px) {
+    .OneTask{
+        min-width: 300px;
+    }
+}
+
+
+
 

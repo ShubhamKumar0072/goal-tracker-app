@@ -7,6 +7,7 @@ import Footer from './Footer'
 import MyGoal from './Pages/MyGoal/MyGoal'
 import OneGoal from './Pages/OneGoal/OneGoal'
 import GoalForm from './Pages/GoalForm/GoalForm'
+import GoalEdit from './Pages/GoalEdit/GoalEdit'
 import DailyTask from './Pages/DailyTask/DailyTask'
 
 
@@ -22,6 +23,7 @@ function App() {
           <Route path = "/goals" element={<MyGoal/>}/>
           <Route path = "/one-goal" element={<OneGoal/>}/>
           <Route path = "/goal-form" element={<GoalForm/>}/>
+          <Route path = "/goal-edit/:goalId" element={<GoalEdit/>}/>
           <Route path = "/tasks" element={<DailyTask/>}/>
         </Routes>
       </main>

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./GoalForm.css"
 import { useState } from "react";
+
 export default function GoalForm() {
 
   const navigate = useNavigate();
@@ -95,8 +96,8 @@ export default function GoalForm() {
           <DayPicker onSelectDays={handleDays} />
           <div style={{ display: "flex", justifyContent: "center" }}>
             <Button
-              variant="contained"
-              type="submit"
+              variant="contained" 
+              type="submit" 
               sx={{
                 margin: "1rem",
                 display: "flex",

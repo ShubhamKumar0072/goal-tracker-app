@@ -26,6 +26,8 @@ async function main() {
 }
 
 
+
+
 //Get Goal List
 app.get("/goals", async (req, res) => {
   let goals = await Goal.find();
@@ -67,6 +69,30 @@ app.get("/goals/:id", async (req, res) => {
   let goal = await Goal.findById(id);
   res.send(goal);
 })
+
+//Edit a Goal
+app.put("/goals/:id", async (req, res) => {
+  const { id } = req.params;
+  const updateFields = req.body;
+  
+  try {
+    const updatedGoal = await Goal.findByIdAndUpdate(
+      id,
+      updateFields,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedGoal) {
+      return res.status(404).json({ error: "Goal not found" });
+    }
+
+    res.status(200).json({ message: "Goal updated successfully", goal: updatedGoal });
+  } catch (err) {
+    console.error("Error updating goal:", err);
+    res.status(400).json({ error: "Failed to update goal" });
+  }
+});
+
 
 //Delete a Goal
 app.delete("/goals/:id", async (req, res) => {
