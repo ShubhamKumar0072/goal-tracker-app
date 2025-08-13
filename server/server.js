@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const Task = require("./models/task");
 const Goal = require("./models/goal");
 const addNewTask = require("./util/newTask");
-const {deleteTaskByGoal,deleteTaskById} = require("./util/deleteTask");
+const { deleteTaskByGoal, deleteTaskById } = require("./util/deleteTask");
 
 
 
@@ -15,6 +15,16 @@ const corsOption = {
 app.use(cors(corsOption));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+function toUTCStartOfDay(localDate) {
+  return new Date(Date.UTC(
+    localDate.getFullYear(),
+    localDate.getMonth(),
+    localDate.getDate()
+  ));
+}
+
+
 
 //Database SetUp
 main().then(() => {
@@ -74,7 +84,7 @@ app.get("/goals/:id", async (req, res) => {
 app.put("/goals/:id", async (req, res) => {
   const { id } = req.params;
   const updateFields = req.body;
-  
+
   try {
     const updatedGoal = await Goal.findByIdAndUpdate(
       id,
@@ -129,28 +139,28 @@ app.delete("/goals/:id", async (req, res) => {
 
 //Show a Task
 app.get("/tasks", async (req, res) => {
-    try {
-        //console.log(req.query.date);
-        const date = new Date(req.query.date);
-        const taskDoc = await Task.findOne({ taskDate: date });
-        //console.log("Task Data : ",taskDoc);
-        res.send(taskDoc);
-    } catch (err) {
-        res.status(500).json({ error: "Failed to fetch tasks" });
-    }
+  try {
+    //console.log(req.query.date);
+    const date = new Date(req.query.date);
+    const taskDoc = await Task.findOne({ taskDate: date });
+    //console.log("Task Data : ",taskDoc);
+    res.send(taskDoc);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch tasks" });
+  }
 });
 
 //Add a new task
-app.post("/tasks",async(req,res)=>{
-  try{
+app.post("/tasks", async (req, res) => {
+  try {
     //console.log("arrived Date = ",req.query.date);
     const date = new Date(req.query.date);
     // const taskName = req.body.taskName;
     // console.log(task);
     addNewTask(date, req.body.taskName, req.body.diff);
     res.status(200).json({ message: "Task Added successfully" });
-  }catch(err){
-    res.status(500).json({error: "Failed to add task"});
+  } catch (err) {
+    res.status(500).json({ error: "Failed to add task" });
   }
 })
 
@@ -207,6 +217,7 @@ app.put("/tasks", async (req, res) => {
       }
     }
 
+
     // Find or create the task document
     let taskDoc = await Task.findOne({ taskDate: parsedDate });
 
@@ -224,6 +235,120 @@ app.put("/tasks", async (req, res) => {
   } catch (error) {
     console.error("Error updating tasks:", error);
     res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+//BarGraph Data
+
+// Previous 7 days (sum of diff per day)
+app.get("/dash/bargraph", async (req, res) => {
+  try {
+    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const today = new Date();
+    let result = [];
+
+    for (let i = 6; i >= 0; i--) {
+      let date = new Date(today);
+      date.setDate(today.getDate() - i);
+      date = toUTCStartOfDay(date);
+
+      const taskDoc = await Task.findOne({ taskDate: date });
+      //console.log(taskDoc);
+      let totalDiff = 0;
+      let goodDiff = 0;
+      if (taskDoc && Array.isArray(taskDoc.tasks)) {
+        totalDiff = taskDoc.tasks.reduce((acc, t) => acc + (typeof t.diff === "number" ? t.diff : 0), 0);
+        goodDiff = taskDoc.tasks
+          .filter(t => t.isComplete === true)
+          .reduce((acc, t) => acc + (typeof t.diff === "number" ? t.diff : 0), 0);
+      }
+
+
+      result.push({
+        day: daysOfWeek[date.getDay()],
+        completePoint: goodDiff
+      });
+    }
+
+    res.send(result);
+  } catch (err) {
+    console.error("Error generating bar graph data:", err);
+    res.status(500).json({ error: "Failed to generate bar graph data" });
+  }
+});
+
+// Previous 6 weeks (sum of diff per week)
+app.get("/dash/weekgraph", async (req, res) => {
+  try {
+    const today = new Date();
+    let result = [];
+
+    for (let w = 5; w >= 0; w--) {
+      let weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - today.getDay() - (w * 7));
+      weekStart.setHours(0, 0, 0, 0);
+
+      let weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+
+      let sumDiff = 0;
+      for (let d = 0; d < 7; d++) {
+        let date = new Date(weekStart);
+        date.setDate(weekStart.getDate() + d);
+        date.setHours(0, 0, 0, 0);
+
+        const taskDoc = await Task.findOne({ taskDate: date });
+        if (taskDoc && Array.isArray(taskDoc.tasks)) {
+          sumDiff += taskDoc.tasks.reduce((acc, t) => acc + (typeof t.diff === "number" ? t.diff : 0), 0);
+        }
+      }
+
+      result.push({
+        week: `${weekStart.toLocaleDateString()} - ${weekEnd.toLocaleDateString()}`,
+        diffSum: sumDiff
+      });
+    }
+
+    res.json(result);
+  } catch (err) {
+    console.error("Error generating week graph data:", err);
+    res.status(500).json({ error: "Failed to generate week graph data" });
+  }
+});
+
+// Previous 6 months (sum of diff per month)
+app.get("/dash/monthgraph", async (req, res) => {
+  try {
+    const today = new Date();
+    let result = [];
+
+    for (let m = 5; m >= 0; m--) {
+      let monthDate = new Date(today.getFullYear(), today.getMonth() - m, 1);
+      let year = monthDate.getFullYear();
+      let month = monthDate.getMonth();
+
+      let sumDiff = 0;
+      let daysInMonth = new Date(year, month + 1, 0).getDate();
+      for (let d = 1; d <= daysInMonth; d++) {
+        let date = new Date(year, month, d);
+        date.setHours(0, 0, 0, 0);
+
+        const taskDoc = await Task.findOne({ taskDate: date });
+        if (taskDoc && Array.isArray(taskDoc.tasks)) {
+          sumDiff += taskDoc.tasks.reduce((acc, t) => acc + (typeof t.diff === "number" ? t.diff : 0), 0);
+        }
+      }
+
+      result.push({
+        month: monthDate.toLocaleString('default', { month: 'short', year: 'numeric' }),
+        diffSum: sumDiff
+      });
+    }
+
+    res.json(result);
+  } catch (err) {
+    console.error("Error generating month graph data:", err);
+    res.status(500).json({ error: "Failed to generate month graph data" });
   }
 });
 

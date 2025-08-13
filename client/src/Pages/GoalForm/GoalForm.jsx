@@ -5,7 +5,7 @@ import TextBox from "../../Components/FormElements/TextBox"
 import Button from '@mui/material/Button';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./GoalForm.css"
+import "./GoalForm.css";
 import { useState } from "react";
 
 export default function GoalForm() {

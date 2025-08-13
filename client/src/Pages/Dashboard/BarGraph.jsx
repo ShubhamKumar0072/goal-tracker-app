@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Button } from '@mui/material';
 import "./BarGraph.css";
 import {
@@ -11,16 +11,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-
-const data1 = [
-  { name: 'Sun', uv: 4000 },
-  { name: 'Mon', uv: 3000 },
-  { name: 'Tue', uv: 2000 },
-  { name: 'Wed', uv: 2000 },
-  { name: 'Thu', uv: 2780 },
-  { name: 'Fri', uv: 1890 },
-  { name: 'Sat', uv: 2390 },
-];
+import useFetch from '../../hooks/useFetch';
 
 const data2 = [
   { name: 'Week1', uv: 9000 },
@@ -46,9 +37,22 @@ let btnStyle = {color:"#333333", fontSize:"18px", fontWeight:"500", backgroundCo
 // ...existing imports and code...
 
 const BarGraph = () => {
-    const[data,setData] = useState(data1);
-    function change1(event){
-        setData(data1);
+
+    const { data, loading, error } = useFetch("/dash/bargraph");
+    const [chartData, setChartData] = useState([]);
+
+    useEffect(() => {
+      if (data) setChartData(data);
+    }, [data]);
+
+    console.log(data);
+    console.log(chartData);
+
+    if (loading) return (<h1>Loading ....</h1>);
+    if (error) return(<h1>Error : {error.message} </h1>);
+
+    function change1() {
+        setChartData(data);
     }
     function change2(event){
         setData(data2);
@@ -59,12 +63,12 @@ const BarGraph = () => {
     return (
         <div className='BarGraph' style={{ width: "100%", maxWidth: 700, }}>
             <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={data}>
-                    <XAxis dataKey="name" />
+                <BarChart data={chartData}>
+                    <XAxis dataKey="day" />
                     <YAxis />
                     <Tooltip/>
                     <Legend />
-                    <Bar dataKey="uv" fill="#FF6F61" radius={[20, 20, 0, 0]} />
+                    <Bar dataKey="completePoint" fill="#FF6F61" radius={[20, 20, 0, 0]} />
                 </BarChart>
             </ResponsiveContainer>
             <div className="graph-btn">
