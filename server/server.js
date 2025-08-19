@@ -241,7 +241,7 @@ app.put("/tasks", async (req, res) => {
 //BarGraph Data
 
 // Previous 7 days (sum of diff per day)
-app.get("/dash/bargraph", async (req, res) => {
+app.get("/dash/bargraph-day", async (req, res) => {
   try {
     const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const today = new Date();
@@ -277,82 +277,112 @@ app.get("/dash/bargraph", async (req, res) => {
   }
 });
 
-// Previous 6 weeks (sum of diff per week)
-app.get("/dash/weekgraph", async (req, res) => {
+// Last 6 weeks (sum of diff per week)
+app.get("/dash/bargraph-weeks", async (req, res) => {
   try {
     const today = new Date();
     let result = [];
 
-    for (let w = 5; w >= 0; w--) {
-      let weekStart = new Date(today);
-      weekStart.setDate(today.getDate() - today.getDay() - (w * 7));
-      weekStart.setHours(0, 0, 0, 0);
+    // Loop for last 6 weeks
+    for (let i = 5; i >= 0; i--) {
+      let startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - today.getDay() - (i * 7)); // Sunday
+      startOfWeek = toUTCStartOfDay(startOfWeek);
 
-      let weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekStart.getDate() + 6);
+      let endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 6); // Saturday
+      endOfWeek = toUTCStartOfDay(endOfWeek);
 
-      let sumDiff = 0;
-      for (let d = 0; d < 7; d++) {
-        let date = new Date(weekStart);
-        date.setDate(weekStart.getDate() + d);
-        date.setHours(0, 0, 0, 0);
+      //console.log(startOfWeek,endOfWeek);
 
-        const taskDoc = await Task.findOne({ taskDate: date });
-        if (taskDoc && Array.isArray(taskDoc.tasks)) {
-          sumDiff += taskDoc.tasks.reduce((acc, t) => acc + (typeof t.diff === "number" ? t.diff : 0), 0);
+      // Fetch all tasks within this week
+      const taskDocs = await Task.find({
+        taskDate: { $gte: startOfWeek, $lte: endOfWeek }
+      });
+
+      let totalDiff = 0;
+      let goodDiff = 0;
+
+      taskDocs.forEach(doc => {
+        if (Array.isArray(doc.tasks)) {
+          totalDiff += doc.tasks.reduce(
+            (acc, t) => acc + (typeof t.diff === "number" ? t.diff : 0),
+            0
+          );
+          goodDiff += doc.tasks
+            .filter(t => t.isComplete === true)
+            .reduce((acc, t) => acc + (typeof t.diff === "number" ? t.diff : 0), 0);
         }
-      }
+      });
 
       result.push({
-        week: `${weekStart.toLocaleDateString()} - ${weekEnd.toLocaleDateString()}`,
-        diffSum: sumDiff
+        week: `W${1+i}`, // Week1 ... Week6
+        completePoint: goodDiff,
+        totalPoint: totalDiff
       });
     }
 
-    res.json(result);
+    res.send(result);
   } catch (err) {
-    console.error("Error generating week graph data:", err);
-    res.status(500).json({ error: "Failed to generate week graph data" });
+    console.error("Error generating weekly bar graph data:", err);
+    res.status(500).json({ error: "Failed to generate weekly bar graph data" });
   }
 });
 
-// Previous 6 months (sum of diff per month)
-app.get("/dash/monthgraph", async (req, res) => {
+
+// Last 6 months (month name wise)
+app.get("/dash/bargraph-months", async (req, res) => {
   try {
     const today = new Date();
     let result = [];
 
-    for (let m = 5; m >= 0; m--) {
-      let monthDate = new Date(today.getFullYear(), today.getMonth() - m, 1);
-      let year = monthDate.getFullYear();
-      let month = monthDate.getMonth();
+    // Loop for last 6 months
+    for (let i = 5; i >= 0; i--) {
+      let firstDay = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      firstDay = toUTCStartOfDay(firstDay);
 
-      let sumDiff = 0;
-      let daysInMonth = new Date(year, month + 1, 0).getDate();
-      for (let d = 1; d <= daysInMonth; d++) {
-        let date = new Date(year, month, d);
-        date.setHours(0, 0, 0, 0);
+      let lastDay = new Date(today.getFullYear(), today.getMonth() - i + 1, 0);
+      lastDay = toUTCStartOfDay(lastDay);
 
-        const taskDoc = await Task.findOne({ taskDate: date });
-        if (taskDoc && Array.isArray(taskDoc.tasks)) {
-          sumDiff += taskDoc.tasks.reduce((acc, t) => acc + (typeof t.diff === "number" ? t.diff : 0), 0);
+      // Fetch all tasks within this month
+      const taskDocs = await Task.find({
+        taskDate: { $gte: firstDay, $lte: lastDay }
+      });
+
+      let totalDiff = 0;
+      let goodDiff = 0;
+
+      taskDocs.forEach(doc => {
+        if (Array.isArray(doc.tasks)) {
+          totalDiff += doc.tasks.reduce(
+            (acc, t) => acc + (typeof t.diff === "number" ? t.diff : 0),
+            0
+          );
+          goodDiff += doc.tasks
+            .filter(t => t.isComplete === true)
+            .reduce(
+              (acc, t) => acc + (typeof t.diff === "number" ? t.diff : 0),
+              0
+            );
         }
-      }
+      });
+
+      // Month short name (Jan, Feb, etc.)
+      const monthName = firstDay.toLocaleString("default", { month: "short" });
 
       result.push({
-        month: monthDate.toLocaleString('default', { month: 'short', year: 'numeric' }),
-        diffSum: sumDiff
+        month: monthName,
+        completePoint: goodDiff,
+        totalPoint: totalDiff
       });
     }
 
-    res.json(result);
+    res.send(result);
   } catch (err) {
-    console.error("Error generating month graph data:", err);
-    res.status(500).json({ error: "Failed to generate month graph data" });
+    console.error("Error generating monthly bar graph data:", err);
+    res.status(500).json({ error: "Failed to generate monthly bar graph data" });
   }
 });
-
-
 
 
 app.listen(8080, () => {
