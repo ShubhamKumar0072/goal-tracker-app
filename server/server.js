@@ -385,6 +385,59 @@ app.get("/dash/bargraph-months", async (req, res) => {
 });
 
 
+//Last 180 days Data
+app.get("/dash/pie-chart",async(req,res)=>{
+  try{
+    let today = new Date();
+    let win =0;
+    let lose =0;
+    let mid =0;
+
+    for(let i=179;i>=0;i--){
+      let date = new Date(today);
+      date.setDate(today.getDate()-i);
+      date = toUTCStartOfDay(date);
+
+      const taskDoc = await Task.findOne({taskDate: date});
+      let totalDiff = 0;
+      let goodDiff =0;
+      if (taskDoc && Array.isArray(taskDoc.tasks)) {
+        totalDiff = taskDoc.tasks.reduce((acc, t) => acc + (typeof t.diff === "number" ? t.diff : 0), 0);
+        goodDiff = taskDoc.tasks
+          .filter(t => t.isComplete === true)
+          .reduce((acc, t) => acc + (typeof t.diff === "number" ? t.diff : 0), 0);
+        
+        let per = (goodDiff*100)/totalDiff;
+        if(!isNaN(per)){
+          if(per>80){
+            win++;
+          }else if(per>=20){
+            mid++;
+          }else{
+            lose++;
+          }
+        }
+       }
+    }
+
+    const result = [
+      { name: 'Success', value: win },
+      { name: 'Partially good', value: mid },
+      { name: 'Fail', value: lose },
+    ];
+    
+    res.send(result);
+
+  }catch(err){
+    console.error("Error generating PieChart data:", err);
+    res.status(500).json({ error: "Failed to generate Pie Chart data" });
+  }
+});
+
+//Data of Goal Pie Chart
+
+
+
 app.listen(8080, () => {
   console.log("server started on port 8080");
 })
