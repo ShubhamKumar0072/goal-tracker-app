@@ -11,3 +11,23 @@
 .OneGoalCalender .react-calendar__navigation__next2-button {
     display: none;
 }
+
+
+/* Example custom background colors */
+.highlight-red {
+  background: #E53935 !important;
+  color: white !important;
+  border-radius: 50%;
+}
+
+.highlight-orange {
+  background: #FF9800 !important;
+  color: white !important;
+  border-radius: 50%;
+}
+
+.highlight-green {
+  background: #4CAF50 !important;
+  color: white !important;
+  border-radius: 50%;
+}

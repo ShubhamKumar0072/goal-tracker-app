@@ -34,8 +34,8 @@ export default function OneGoal() {
         <div className="OneGoal">
             <OneGoalTop title={data.goalName} description={data.desc} />
             <div className="onegole-chart">
-                <OneGoalCalendar />
-                <OneGoalPie />
+                <OneGoalCalendar goalId={goalId} />
+                <OneGoalPie goalId={goalId} />
             </div>
             <div className="onegole-btn">
                 <Button

@@ -316,7 +316,7 @@ app.get("/dash/bargraph-weeks", async (req, res) => {
       });
 
       result.push({
-        week: `W${1+i}`, // Week1 ... Week6
+        week: `W${1 + i}`, // Week1 ... Week6
         completePoint: goodDiff,
         totalPoint: totalDiff
       });
@@ -386,38 +386,38 @@ app.get("/dash/bargraph-months", async (req, res) => {
 
 
 //Last 180 days Data
-app.get("/dash/pie-chart",async(req,res)=>{
-  try{
+app.get("/dash/pie-chart", async (req, res) => {
+  try {
     let today = new Date();
-    let win =0;
-    let lose =0;
-    let mid =0;
+    let win = 0;
+    let lose = 0;
+    let mid = 0;
 
-    for(let i=179;i>=0;i--){
+    for (let i = 179; i >= 0; i--) {
       let date = new Date(today);
-      date.setDate(today.getDate()-i);
+      date.setDate(today.getDate() - i);
       date = toUTCStartOfDay(date);
 
-      const taskDoc = await Task.findOne({taskDate: date});
+      const taskDoc = await Task.findOne({ taskDate: date });
       let totalDiff = 0;
-      let goodDiff =0;
+      let goodDiff = 0;
       if (taskDoc && Array.isArray(taskDoc.tasks)) {
         totalDiff = taskDoc.tasks.reduce((acc, t) => acc + (typeof t.diff === "number" ? t.diff : 0), 0);
         goodDiff = taskDoc.tasks
           .filter(t => t.isComplete === true)
           .reduce((acc, t) => acc + (typeof t.diff === "number" ? t.diff : 0), 0);
-        
-        let per = (goodDiff*100)/totalDiff;
-        if(!isNaN(per)){
-          if(per>80){
+
+        let per = (goodDiff * 100) / totalDiff;
+        if (!isNaN(per)) {
+          if (per > 80) {
             win++;
-          }else if(per>=20){
+          } else if (per >= 20) {
             mid++;
-          }else{
+          } else {
             lose++;
           }
         }
-       }
+      }
     }
 
     const result = [
@@ -425,16 +425,152 @@ app.get("/dash/pie-chart",async(req,res)=>{
       { name: 'Partially good', value: mid },
       { name: 'Fail', value: lose },
     ];
-    
+
     res.send(result);
 
-  }catch(err){
+  } catch (err) {
     console.error("Error generating PieChart data:", err);
     res.status(500).json({ error: "Failed to generate Pie Chart data" });
   }
 });
 
-//Data of Goal Pie Chart
+// Data of Goal Pie Chart
+app.get("/goals/:id/piechart", async (req, res) => {
+  let { id } = req.params;
+  try {
+    const goalDoc = await Goal.findById(id);
+    if (!goalDoc) {
+      return res.status(404).json({ error: "Goal not found" });
+    }
+
+    let startDate = new Date(goalDoc.startDate);
+    let tDate = goalDoc.totalDays;
+
+    // counters
+    let restDays = 0;
+    let complete = 0;
+    let fail = 0;
+
+    const today = toUTCStartOfDay(new Date());
+
+    for (let i = 0; i < tDate; i++) {
+      let date = new Date(startDate);
+      date.setDate(startDate.getDate() + i);
+      date = toUTCStartOfDay(date);
+
+      if (date > today) break;
+
+      // find taskDoc of that day
+      const taskDoc = await Task.findOne({ taskDate: date });
+
+      if (!taskDoc || !Array.isArray(taskDoc.tasks)) {
+        // no tasks for this day
+        restDays++;
+        continue;
+      }
+
+      // filter tasks for this goal
+      const goalTasks = taskDoc.tasks.filter(
+        t => t.goal && t.goal.toString() === id
+      );
+
+      if (goalTasks.length === 0) {
+        // No task linked with this goal that day
+        restDays++;
+      } else {
+        goalTasks.forEach(t => {
+          if (t.isComplete) {
+            complete++;
+          } else {
+            fail++;
+          }
+        });
+      }
+    }
+
+    const data = [
+      { name: "Completed", value: complete },
+      { name: "Rest Days", value: restDays },
+      { name: "Fail to Complete", value: fail },
+    ];
+
+    res.send(data);
+  } catch (err) {
+    console.error("Error accessing data:", err);
+    res.status(500).json({ error: "Failed to generate Pie Chart data" });
+  }
+});
+
+
+
+// Data for Calendar Highlighting (goal-specific)
+
+app.get("/goals/:id/calendar", async (req, res) => {
+  let { id } = req.params;
+  try {
+    const goalDoc = await Goal.findById(id);
+    if (!goalDoc) {
+      return res.status(404).json({ error: "Goal not found" });
+    }
+    //console.log(goalDoc);
+
+    let startDate = new Date(goalDoc.startDate);
+    let tDate = goalDoc.totalDays;
+
+    const today = toUTCStartOfDay(new Date());
+    const highlightDates = {};
+
+    for (let i = 0; i < tDate; i++) {
+      let date = new Date(startDate);
+      date.setDate(startDate.getDate() + i);
+      date = toUTCStartOfDay(date);
+
+      // 🚨 Stop if beyond today
+      if (date > today) break;
+
+      // console.log(date);
+      // console.log("today : ", today);
+
+      // Format YYYY-MM-DD
+      const dateKey = date.toISOString().split("T")[0];
+
+      const taskDoc = await Task.findOne({ taskDate: date });
+
+      if (!taskDoc || !Array.isArray(taskDoc.tasks)) {
+        highlightDates[dateKey] = "orange"; // rest day
+        continue;
+      }
+
+      // ✅ Only check tasks with this goal ID
+      const goalTasks = taskDoc.tasks.filter(
+        t => t.goal && t.goal.toString() === id
+      );
+
+      if (goalTasks.length === 0) {
+        highlightDates[dateKey] = "orange"; // no tasks for this goal → rest day
+      } else {
+        // check completion
+        let allComplete = goalTasks.every(t => t.isComplete === true);
+        let allFail = goalTasks.every(t => t.isComplete === false);
+
+        if (allComplete) {
+          highlightDates[dateKey] = "green"; // all completed
+        } else if (allFail) {
+          highlightDates[dateKey] = "red"; // all failed
+        } else {
+          highlightDates[dateKey] = "red"; // mixed → treat as fail
+        }
+      }
+    }
+
+    //console.log(highlightDates);
+    res.send(highlightDates);
+  } catch (err) {
+    console.error("Error accessing data:", err);
+    res.status(500).json({ error: "Failed to generate calendar data" });
+  }
+});
+
 
 
 
