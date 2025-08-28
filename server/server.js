@@ -434,6 +434,70 @@ app.get("/dash/pie-chart", async (req, res) => {
   }
 });
 
+//Data for dashboard calender
+app.get("/dash/calendar/:month", async (req, res) => {
+  let { month } = req.params;
+
+  try {
+
+    const monthMap = {
+      Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+      Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
+    };
+
+    const year = new Date().getFullYear(); // current year
+    const monthIndex = monthMap[month];
+    if (monthIndex === undefined) {
+      throw new Error("Invalid month abbreviation");
+    }
+
+    const firstDate = toUTCStartOfDay(new Date(year, monthIndex, 1));
+    const lastDate =toUTCStartOfDay(new Date(year, monthIndex + 1, 0));
+
+    let i =0;
+    let result = [];
+    while(true) {
+      let date = new Date(firstDate);
+      date.setDate(firstDate.getDate() + i);
+      i++;
+      date = toUTCStartOfDay(date);
+      let Fdate =date.toLocaleDateString('en-CA');
+
+      if(date>lastDate || date > toUTCStartOfDay(new Date())) break;
+
+      const taskDoc = await Task.findOne({ taskDate: date });
+      let totalDiff = 0;
+      let goodDiff = 0;
+      if (taskDoc && Array.isArray(taskDoc.tasks)) {
+        totalDiff = taskDoc.tasks.reduce((acc, t) => acc + (typeof t.diff === "number" ? t.diff : 0), 0);
+        goodDiff = taskDoc.tasks
+          .filter(t => t.isComplete === true)
+          .reduce((acc, t) => acc + (typeof t.diff === "number" ? t.diff : 0), 0);
+
+        let per = (goodDiff * 100) / totalDiff;
+        if (!isNaN(per)) {
+          if (per > 80) {
+            result.push({date:Fdate,color:"green1"});
+          } else if (per >= 50) {
+            result.push({date:Fdate,color:"green2"});
+          }else if(per >= 20){
+            result.push({date:Fdate,color:"green3"});
+          } else {
+            result.push({date:Fdate,color:"green4"});
+          }
+        }
+      }
+    }
+    // console.log("Month Name : ", month);
+    // console.log(result);
+    res.send(result);
+  } catch (err) {
+    console.error("Error accessing data:", err);
+    res.status(500).json({ error: "Failed to generate Calender View" });
+  }
+});
+
+
 // Data of Goal Pie Chart
 app.get("/goals/:id/piechart", async (req, res) => {
   let { id } = req.params;

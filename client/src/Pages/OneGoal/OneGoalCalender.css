@@ -13,21 +13,16 @@
 }
 
 
-/* Example custom background colors */
-.highlight-red {
-  background: #E53935 !important;
-  color: white !important;
-  border-radius: 50%;
-}
-
-.highlight-orange {
-  background: #FF9800 !important;
-  color: white !important;
-  border-radius: 50%;
-}
-
+/* ✅ Complete day */
 .highlight-green {
-  background: #4CAF50 !important;
+  background: #4caf50 !important;
   color: white !important;
-  border-radius: 50%;
+  border-radius: 8px;
+}
+
+/* ❌ Fail to complete */
+.highlight-red {
+  background: #f44336 !important;
+  color: white !important;
+  border-radius: 8px;
 }

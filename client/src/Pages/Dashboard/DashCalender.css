@@ -36,10 +36,34 @@
 }
 
 .react-calendar__month-view__days__day--neighboringMonth {
-    color: transparent;
-    pointer-events: none;
-    background: none;
+  visibility: hidden;   /* hides the text & button but keeps cell space */
+  pointer-events: none; /* avoid clicking */
 }
+
+.highlight-green4 {
+  background: #c8f7c5 !important; /* soft fresh green */
+  color: #064420 !important;
+  border-radius: 8px;
+}
+
+.highlight-green3 {
+  background: #81f29d !important; /* medium-light green */
+  color: #064420 !important;
+  border-radius: 8px;
+}
+
+.highlight-green2 {
+  background: #34c759 !important; /* iOS-style bright green */
+  color: white !important;
+  border-radius: 8px;
+}
+
+.highlight-green1 {
+  background: #1b8f3a !important; /* strong darker green */
+  color: white !important;
+  border-radius: 8px;
+}
+
 
 
 @media (max-width: 850px) {

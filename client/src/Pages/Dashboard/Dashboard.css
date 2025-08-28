@@ -17,6 +17,15 @@
     margin: 1rem;
 }
 
+.DashCalender{
+    display: flex;
+    justify-content: space-evenly;
+    text-align: center;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
 @media(max-width: 850px){
     .Dashboard-graph{
         flex-direction: column;
