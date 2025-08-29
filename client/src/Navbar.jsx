@@ -22,7 +22,7 @@ export default function Navbar() {
                     <li className="nav-items"> <LinkButton text="Home" link="/" /> </li>
                     <li className="nav-items"> <LinkButton text="DashBoard" link="/dashboard" /> </li>
                     <li className="nav-items"> <LinkButton text="Guide" link="/guide" /> </li>
-                    <li className="nav-items"> <LinkButton text="SignUp/Login" link="/singUp" /></li>
+                    <li className="nav-items"> <LinkButton text="SignUp/Login" link="/singUpLogin" /></li>
                 </ul>
             </div>
         </nav>

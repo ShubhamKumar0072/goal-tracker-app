@@ -9,6 +9,7 @@ import OneGoal from './Pages/OneGoal/OneGoal'
 import GoalForm from './Pages/GoalForm/GoalForm'
 import GoalEdit from './Pages/GoalEdit/GoalEdit'
 import DailyTask from './Pages/DailyTask/DailyTask'
+import SignUpLogin from './Pages/SignUpLogin/SignUpLogin'
 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
           <Route path = "/goal-form" element={<GoalForm/>}/>
           <Route path = "/goal-edit/:goalId" element={<GoalEdit/>}/>
           <Route path = "/tasks" element={<DailyTask/>}/>
+          <Route path = "/singUpLogin" element={<SignUpLogin/>}/>
         </Routes>
       </main>
       <Footer/>
