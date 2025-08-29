@@ -9,13 +9,13 @@ import {
   LabelList
 } from 'recharts';
 
-const data = [
-  { name: 'Work Days', value: 12 },
-  { name: 'Rest Days', value: 18 },
-  { name: 'Fail', value: 10 },
-];
+// const data = [
+//   { name: 'Work Days', value: 12 },
+//   { name: 'Rest Days', value: 18 },
+//   { name: 'Fail', value: 10 },
+// ];
 
-const TinyBarChart = () => {
+const TinyBarChart = ({data}) => {
   return (
     <div style={{width:220, height:100}}>
       <ResponsiveContainer width="100%" height="100%" >

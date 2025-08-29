@@ -17,7 +17,7 @@ export default function MyGoal(){
         <div className="MyGoal"> 
             <div className="goleCards">
                 {data?.map((goal)=>(
-                    <GoalCard key={goal._id} title={goal.goalName} text={goal.subLine} bc={"#FFE9D6"} onClick={()=>navigate("/one-goal", { state: { goalId: goal._id } })}/>
+                    <GoalCard key={goal._id} goalId = {goal._id} title={goal.goalName} text={goal.subLine} bc={"#FFE9D6"} onClick={()=>navigate("/one-goal", { state: { goalId: goal._id } })}/>
                 ))}
             </div>
             <AddCard onClick={()=>navigate("/goal-form")}/>
