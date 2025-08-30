@@ -1,7 +1,6 @@
 function ensureAuth(req, res, next) {
   if (req.isAuthenticated()) return next();
-  return next();
-  // res.status(401).json({ redirect: "/singUpLogin" });
+  res.status(401).json({ redirect: "/singUpLogin" });
 }
 
 module.exports = ensureAuth;
