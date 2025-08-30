@@ -12,7 +12,7 @@ export default function SignUpLogin() {
                     Sign up or log in to get started!
                 </p>
                 <LinkButton
-                    link="http://localhost:8080/auth/google"
+                    link="https://goal-tracker-app-backend-3tnq.onrender.com/auth/google"
                     text="Continue With Google"
                     bc="#4285F4"
                     col="#fff"

@@ -20,7 +20,7 @@ export default function OneGoal() {
 
     async function handleDelete() {
         try {
-            await axios.delete(`http://localhost:8080/goals/${goalId}`,{ withCredentials: true });
+            await axios.delete(`https://goal-tracker-app-backend-3tnq.onrender.com/goals/${goalId}`,{ withCredentials: true });
             alert("Goal deleted successfully");
             navigate("/goals");
         } catch (err) {

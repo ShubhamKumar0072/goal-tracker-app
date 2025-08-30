@@ -30,7 +30,7 @@ export default function DailyTask() {
     async function fetchTasks() {
         try {
             const date2 = toUTCStartOfDay(date);
-            const response = await axios.get(`http://localhost:8080/tasks?date=${date2.toISOString()}`, { withCredentials: true });
+            const response = await axios.get(`https://goal-tracker-app-backend-3tnq.onrender.com/tasks?date=${date2.toISOString()}`, { withCredentials: true });
             setData(response.data);
         } catch (err) {
             if (err.response?.status === 401) {

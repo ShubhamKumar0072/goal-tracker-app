@@ -9,7 +9,7 @@ export default function LogOut() {
   const [confirm, setConfirm] = useState(false);
 
   function handleLogout() {
-    window.location.href = "http://localhost:8080/logout";
+    window.location.href = "https://goal-tracker-app-backend-3tnq.onrender.com/logout";
   }
 
   function handleCancel() {

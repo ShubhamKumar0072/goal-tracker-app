@@ -10,7 +10,7 @@ export default function useFetch(endpoint) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080${endpoint}`, { withCredentials: true });
+        const response = await axios.get(`https://goal-tracker-app-backend-3tnq.onrender.com${endpoint}`, { withCredentials: true });
         setData(response.data);
       } catch (err) {
         if (err.response?.status === 401) {

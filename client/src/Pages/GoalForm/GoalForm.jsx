@@ -39,7 +39,7 @@ export default function GoalForm() {
     //console.log("Processed data:", processedData);
 
     try {
-      const response = await axios.post("http://localhost:8080/goals", processedData, { withCredentials: true });
+      const response = await axios.post("https://goal-tracker-app-backend-3tnq.onrender.com/goals", processedData, { withCredentials: true });
       console.log("Success:", response.data);
       navigate("/goals");
     } catch (err) {
