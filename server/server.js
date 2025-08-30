@@ -13,7 +13,7 @@ const ensureAuth = require("./middleware");
 
 
 const corsOption = {
-  origin: [process.env.FRONTEND_URL],
+  origin: process.env.FRONTEND_URL,
   credentials: true
 }
 app.use(cors(corsOption));
@@ -47,7 +47,7 @@ app.use(session({
   store,
   secret: process.env.SECRET,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: {
     expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
     maxAge: 7 * 24 * 60 * 60 * 1000,
