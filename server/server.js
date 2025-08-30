@@ -11,6 +11,15 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const findOrCreateUser = require('./util/findOrCreateUser');
 const ensureAuth = require("./middleware");
 
+
+const corsOption = {
+  origin: process.env.FRONTEND_URL,
+  credentials: true
+}
+app.use(cors(corsOption));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
 //Database SetUp
 const dbURL = process.env.ATLASDB_URL;
 main().then(() => {
@@ -33,31 +42,20 @@ store.on("error",()=>{
     console.log("error in session store:",err);
 });
 
-const corsOptions = {
-  origin: "https://goal-tracker-app-frontend.onrender.com", // exact frontend domain
-  credentials: true
-};
-app.use(cors(corsOptions));
-
+//setup session
 app.use(session({
   store,
   secret: process.env.SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // true on Render
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000
-  }
+    secure:true,
+    sameSite: "none"
+  },
 }));
-
-
-
-app.use(cors(corsOption));
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
 
 //setup passport
 app.use(passport.initialize());
