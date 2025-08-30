@@ -10,6 +10,7 @@ import GoalForm from './Pages/GoalForm/GoalForm'
 import GoalEdit from './Pages/GoalEdit/GoalEdit'
 import DailyTask from './Pages/DailyTask/DailyTask'
 import SignUpLogin from './Pages/SignUpLogin/SignUpLogin'
+import LogOut from './Pages/LogOut/LogOut'
 
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
           <Route path = "/goal-edit/:goalId" element={<GoalEdit/>}/>
           <Route path = "/tasks" element={<DailyTask/>}/>
           <Route path = "/singUpLogin" element={<SignUpLogin/>}/>
+          <Route path = "/logout" element={<LogOut/>}/>
         </Routes>
       </main>
       <Footer/>

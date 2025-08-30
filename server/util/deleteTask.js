@@ -1,52 +1,72 @@
 const mongoose = require("mongoose");
 const Task = require("../models/task");
 
-//Database SetUp
-main().then(() => {
-    //console.log("Successfully Connected");
-})
-    .catch((err) => console.log(err));
+// //Database SetUp
+// const dbURL = process.env.ATLASDB_URL;
+// main().then(() => {
+//   console.log("Successfully Connected2");
+// })
+//   .catch((err) => console.log(err));
+// async function main() {
+//   await mongoose.connect(dbURL);
+// }
 
-async function main() {
-    await mongoose.connect("mongodb://127.0.0.1:27017/goal_craft");
-}
-
-async function deleteTaskByGoal(date, GoalId) {
+async function deleteTaskByGoal(date, goalId, userId) {
   try {
-    const existingTaskDoc = await Task.findOne({ taskDate: new Date(date) });
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate)) {
+      console.warn("Invalid date format.");
+      return;
+    }
+
+    // Find the task document scoped to the user
+    const existingTaskDoc = await Task.findOne({ taskDate: parsedDate, userId });
 
     if (!existingTaskDoc) {
-      console.warn("No task document found for the given date.");
+      console.warn("No task document found for the given date and user.");
+      return;
+    }
+
+    // Check if any task matches the goal
+    const hasMatchingGoal = existingTaskDoc.tasks.some(
+      task => task.goal && task.goal.toString() === goalId.toString()
+    );
+    if (!hasMatchingGoal) {
+      console.warn("No task with the specified goal found.");
       return;
     }
 
     // Pull the task with matching goal
     await Task.updateOne(
       { _id: existingTaskDoc._id },
-      { $pull: { tasks: { goal: GoalId } } }
+      { $pull: { tasks: { goal:  goalId } } }
     );
 
     // Re-fetch to check if tasks array is now empty
     const updatedDoc = await Task.findById(existingTaskDoc._id);
 
-    if (updatedDoc.tasks.length === 0) {
+    if (!updatedDoc.tasks || updatedDoc.tasks.length === 0) {
       await Task.deleteOne({ _id: updatedDoc._id });
-      //console.log("Task document deleted as tasks array became empty.");
-    } else {
-      //console.log(`Task with goal ${GoalId} deleted successfully.`);
     }
   } catch (error) {
-    console.error("Error deleting task:", error);
+    console.error("Error deleting task by goal:", error);
   }
 }
 
 
-async function deleteTaskById(date, taskId) {
+async function deleteTaskById(date, taskId, userId) {
   try {
-    const existingTaskDoc = await Task.findOne({ taskDate: new Date(date) });
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate)) {
+      console.warn("Invalid date format.");
+      return;
+    }
+
+    // Find the task document scoped to the user
+    const existingTaskDoc = await Task.findOne({ taskDate: parsedDate, userId });
 
     if (!existingTaskDoc) {
-      console.warn("No task document found for the given date.");
+      console.warn("No task document found for the given date and user.");
       return;
     }
 

@@ -1,0 +1,14 @@
+.logout-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  padding: 2rem;
+}
+
+.logout-btn-group {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+}

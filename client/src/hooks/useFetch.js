@@ -10,9 +10,12 @@ export default function useFetch(endpoint) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080${endpoint}`);
+        const response = await axios.get(`http://localhost:8080${endpoint}`, { withCredentials: true });
         setData(response.data);
       } catch (err) {
+        if (err.response?.status === 401) {
+          window.location.href = err.response.data.redirect;
+        }
         setError(err);
       } finally {
         setLoading(false);

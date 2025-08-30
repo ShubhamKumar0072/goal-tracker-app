@@ -6,11 +6,14 @@ import axios from "axios";
 export default function OneTask({ onEdit, label,desc, isDone, taskId, date, goal, onDelete }) {
     async function handleDeleteClick() {
         try {
-            const response = await axios.delete(`http://localhost:8080/tasks/${taskId}?date=${new Date(date).toISOString()}`);
+            const response = await axios.delete(`http://localhost:8080/tasks/${taskId}?date=${new Date(date).toISOString()}`,{ withCredentials: true });
             console.log("Deleted:", response.data);
             if (onDelete) onDelete(); // trigger parent refresh
-        } catch (error) {
-            console.error("Error deleting task:", error);
+        } catch (err) {
+            if (err.response?.status === 401) {
+                window.location.href = err.response.data.redirect;
+            }
+            console.error("Error deleting task:", err);
         }
     }
 

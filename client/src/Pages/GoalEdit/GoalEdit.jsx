@@ -42,10 +42,13 @@ export default function GoalEdit() {
     async function handleSubmit(event) {
         event.preventDefault();
         try {
-            const response = await axios.put(`http://localhost:8080/goals/${goalId}`, formData);
+            const response = await axios.put(`http://localhost:8080/goals/${goalId}`, formData, { withCredentials: true });
             //console.log("Update response:", response.data);
             navigate("/one-goal", { state: { goalId: goalId } })
         } catch (err) {
+            if (err.response?.status === 401) {
+                window.location.href = err.response.data.redirect;
+            }
             console.error("Update error:", err);
         }
     }

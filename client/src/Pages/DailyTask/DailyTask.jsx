@@ -30,9 +30,12 @@ export default function DailyTask() {
     async function fetchTasks() {
         try {
             const date2 = toUTCStartOfDay(date);
-            const response = await axios.get(`http://localhost:8080/tasks?date=${date2.toISOString()}`);
+            const response = await axios.get(`http://localhost:8080/tasks?date=${date2.toISOString()}`, { withCredentials: true });
             setData(response.data);
         } catch (err) {
+            if (err.response?.status === 401) {
+                window.location.href = err.response.data.redirect;
+            }
             console.error("Fetch error:", err);
         }
     }
@@ -46,8 +49,8 @@ export default function DailyTask() {
     //New Task Form
     const [newTask, setNewTask] = useState("");
     const [diff, setDiff] = useState(5);
-    const [desc,setDesc] = useState("");
-    function handelDesc(event){
+    const [desc, setDesc] = useState("");
+    function handelDesc(event) {
         setDesc(event.target.value);
     }
     function handleNewTask(event) {
@@ -64,18 +67,21 @@ export default function DailyTask() {
         let data = {
             taskName: newTask,
             diff: diff,
-            desc : desc,
+            desc: desc,
             isComplete: false,
         }
         try {
             let date2 = toUTCStartOfDay(date);
-            const response = await axios.post(`http://localhost:8080/tasks?date=${date2.toISOString()}`, data);
+            const response = await axios.post(`http://localhost:8080/tasks?date=${date2.toISOString()}`, data,{ withCredentials: true });
             console.log("Success:", response.data);
             setNewTask("");
             setDiff(5);
             fetchTasks();
-        } catch (error) {
-            console.error("Error submitting Task:", error);
+        } catch (err) {
+            if (err.response?.status === 401) {
+                window.location.href = err.response.data.redirect;
+            }
+            console.error("Error submitting Task:", err);
         }
     }
 
@@ -111,12 +117,15 @@ export default function DailyTask() {
                     goal: task.goal || null,
                     isComplete: task.isComplete
                 }))
-            });
+            },{ withCredentials: true });
 
             console.log("Tasks updated successfully:", response.data);
             fetchTasks(); // Refresh the task list after update
-        } catch (error) {
-            console.error("Error updating tasks:", error);
+        } catch (err) {
+            if (err.response?.status === 401) {
+                window.location.href = err.response.data.redirect;
+            }
+            console.error("Error updating tasks:", err);
         }
     }
 
@@ -126,7 +135,7 @@ export default function DailyTask() {
         <div className="DailyTask">
             <div className='taskForm'>
                 <form action="">
-                    <h1 style={{textAlign:"center"}}>
+                    <h1 style={{ textAlign: "center" }}>
                         {date ? `Date : ${date.toLocaleDateString()}` : ''}
                     </h1>
                     {data?.tasks?.length > 0 ? (

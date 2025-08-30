@@ -6,28 +6,23 @@ const addNewTask = require("../util/newTask");
 const { deleteTaskByGoal, deleteTaskById } = require("../util/deleteTask");
 const { route } = require("./goals");
 const toUTCStartOfDay = require("../util/dateFunc");
+const ensureAuth = require("../middleware");
 
-// function toUTCStartOfDay(localDate) {
-//   return new Date(Date.UTC(
-//     localDate.getFullYear(),
-//     localDate.getMonth(),
-//     localDate.getDate()
-//   ));
-// }
 
 // Previous 7 days (sum of diff per day)
-router.get("/bargraph-day", async (req, res) => {
+router.get("/bargraph-day",ensureAuth, async (req, res) => {
   try {
     const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const today = new Date();
     let result = [];
+    const userId = req.user._id;
 
     for (let i = 6; i >= 0; i--) {
       let date = new Date(today);
       date.setDate(today.getDate() - i);
       date = toUTCStartOfDay(date);
 
-      const taskDoc = await Task.findOne({ taskDate: date });
+      const taskDoc = await Task.findOne({ taskDate: date, userId });
       //console.log(taskDoc);
       let totalDiff = 0;
       let goodDiff = 0;
@@ -55,10 +50,11 @@ router.get("/bargraph-day", async (req, res) => {
 
 
 // Last 6 weeks (sum of diff per week)
-router.get("/bargraph-weeks", async (req, res) => {
+router.get("/bargraph-weeks",ensureAuth, async (req, res) => {
   try {
     const today = new Date();
     let result = [];
+    const userId = req.user._id;
 
     // Loop for last 6 weeks
     for (let i = 5; i >= 0; i--) {
@@ -74,7 +70,8 @@ router.get("/bargraph-weeks", async (req, res) => {
 
       // Fetch all tasks within this week
       const taskDocs = await Task.find({
-        taskDate: { $gte: startOfWeek, $lte: endOfWeek }
+        taskDate: { $gte: startOfWeek, $lte: endOfWeek },
+        userId
       });
 
       let totalDiff = 0;
@@ -107,10 +104,11 @@ router.get("/bargraph-weeks", async (req, res) => {
 });
 
 // Last 6 months (month name wise)
-router.get("/bargraph-months", async (req, res) => {
+router.get("/bargraph-months",ensureAuth, async (req, res) => {
   try {
     const today = new Date();
     let result = [];
+    const userId = req.user._id;
 
     // Loop for last 6 months
     for (let i = 5; i >= 0; i--) {
@@ -122,7 +120,8 @@ router.get("/bargraph-months", async (req, res) => {
 
       // Fetch all tasks within this month
       const taskDocs = await Task.find({
-        taskDate: { $gte: firstDay, $lte: lastDay }
+        taskDate: { $gte: firstDay, $lte: lastDay },
+        userId
       });
 
       let totalDiff = 0;
@@ -162,19 +161,20 @@ router.get("/bargraph-months", async (req, res) => {
 
 
 //Last 180 days Data
-router.get("/pie-chart", async (req, res) => {
+router.get("/pie-chart",ensureAuth, async (req, res) => {
   try {
     let today = new Date();
     let win = 0;
     let lose = 0;
     let mid = 0;
+    const userId = req.user._id;
 
     for (let i = 179; i >= 0; i--) {
       let date = new Date(today);
       date.setDate(today.getDate() - i);
       date = toUTCStartOfDay(date);
 
-      const taskDoc = await Task.findOne({ taskDate: date });
+      const taskDoc = await Task.findOne({ taskDate: date,userId });
       let totalDiff = 0;
       let goodDiff = 0;
       if (taskDoc && Array.isArray(taskDoc.tasks)) {
@@ -212,11 +212,11 @@ router.get("/pie-chart", async (req, res) => {
 
 
 //Data for dashboard calender
-router.get("/calendar/:month", async (req, res) => {
+router.get("/calendar/:month",ensureAuth, async (req, res) => {
   let { month } = req.params;
 
   try {
-
+    const userId = req.user._id;
     const monthMap = {
       Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
       Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
@@ -242,7 +242,7 @@ router.get("/calendar/:month", async (req, res) => {
 
       if(date>lastDate || date > toUTCStartOfDay(new Date())) break;
 
-      const taskDoc = await Task.findOne({ taskDate: date });
+      const taskDoc = await Task.findOne({ taskDate: date, userId });
       let totalDiff = 0;
       let goodDiff = 0;
       if (taskDoc && Array.isArray(taskDoc.tasks)) {

@@ -5,20 +5,33 @@ const Task = require("../models/task");
 const addNewTask = require("../util/newTask");
 const { deleteTaskByGoal, deleteTaskById } = require("../util/deleteTask");
 const toUTCStartOfDay = require("../util/dateFunc");
+const ensureAuth = require("../middleware");
 
 //Get Goal List
-router.get("/", async (req, res) => {
-  let goals = await Goal.find();
-  res.send(goals);
+router.get("/", ensureAuth, async (req, res) => {
+  try {
+    const userId = req.user._id; // or req.user.id depending on your setup
+    const goals = await Goal.find({ userId });
+    res.send(goals);
+  } catch (err) {
+    res.status(500).send({ error: "Failed to fetch goals" });
+  }
 });
 
 
+
 //Add a new Goal
-router.post("/", async (req, res) => {
+router.post("/", ensureAuth, async (req, res) => {
   const daysOfWeek = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
   try {
     // Create and save the new goal first
-    const newGoal = new Goal(req.body);
+    const userId = req.user._id; // assuming Passport.js or JWT middleware sets this
+
+    // Create and save the new goal with userId
+    const newGoal = new Goal({
+      ...req.body,
+      userId
+    });
     await newGoal.save();
 
     //Saving Tasks for new Goal
@@ -30,7 +43,7 @@ router.post("/", async (req, res) => {
 
       if (req.body.days.includes(dayName)) {
         //console.log(`Scheduling task on: ${dayName}`);
-        await addNewTask(currDate, req.body.goalName, req.body.diff, newGoal._id);
+        await addNewTask(currDate, req.body.goalName, req.body.diff, userId, newGoal._id);
       }
     }
 
@@ -44,7 +57,7 @@ router.post("/", async (req, res) => {
 
 
 //View One Goal
-router.get("/:id", async (req, res) => {
+router.get("/:id", ensureAuth, async (req, res) => {
   let { id } = req.params;
   let goal = await Goal.findById(id);
   res.send(goal);
@@ -52,7 +65,7 @@ router.get("/:id", async (req, res) => {
 
 
 //Edit a Goal
-router.put("/:id", async (req, res) => {
+router.put("/:id", ensureAuth, async (req, res) => {
   const { id } = req.params;
   const updateFields = req.body;
 
@@ -76,11 +89,12 @@ router.put("/:id", async (req, res) => {
 
 
 //Delete a Goal
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", ensureAuth, async (req, res) => {
   const daysOfWeek = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
   try {
     const { id } = req.params;
     const currGoal = await Goal.findById(id);
+    const userId = req.user._id;
 
     if (!currGoal) {
       return res.status(404).json({ error: "Goal not found" });
@@ -95,7 +109,7 @@ router.delete("/:id", async (req, res) => {
       const dayName = daysOfWeek[currDate.getDay()];
 
       if (currGoal.days.includes(dayName)) {
-        await deleteTaskByGoal(currDate, currGoal._id);
+        await deleteTaskByGoal(toUTCStartOfDay(currDate), currGoal._id, userId);
       }
     }
 
@@ -109,7 +123,7 @@ router.delete("/:id", async (req, res) => {
 
 
 // Data of Goal Pie Chart
-router.get("/:id/piechart", async (req, res) => {
+router.get("/:id/piechart",ensureAuth, async (req, res) => {
   let { id } = req.params;
   try {
     const goalDoc = await Goal.findById(id);
@@ -176,7 +190,7 @@ router.get("/:id/piechart", async (req, res) => {
 });
 
 //For Goal of a Calender
-router.get("/:id/calendar", async (req, res) => {
+router.get("/:id/calendar",ensureAuth, async (req, res) => {
   let { id } = req.params;
   try {
     const goalDoc = await Goal.findById(id);

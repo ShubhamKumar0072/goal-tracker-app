@@ -39,11 +39,14 @@ export default function GoalForm() {
     //console.log("Processed data:", processedData);
 
     try {
-      const response = await axios.post("http://localhost:8080/goals", processedData);
+      const response = await axios.post("http://localhost:8080/goals", processedData, { withCredentials: true });
       console.log("Success:", response.data);
       navigate("/goals");
-    } catch (error) {
-      console.error("Error submitting goal:", error);
+    } catch (err) {
+      if (err.response?.status === 401) {
+        window.location.href = err.response.data.redirect;
+      }
+      console.error("Error submitting goal:", err);
     }
   }
 
@@ -96,8 +99,8 @@ export default function GoalForm() {
           <DayPicker onSelectDays={handleDays} />
           <div style={{ display: "flex", justifyContent: "center" }}>
             <Button
-              variant="contained" 
-              type="submit" 
+              variant="contained"
+              type="submit"
               sx={{
                 margin: "1rem",
                 display: "flex",

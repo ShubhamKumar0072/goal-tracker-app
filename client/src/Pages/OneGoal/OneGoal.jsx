@@ -20,10 +20,13 @@ export default function OneGoal() {
 
     async function handleDelete() {
         try {
-            await axios.delete(`http://localhost:8080/goals/${goalId}`);
+            await axios.delete(`http://localhost:8080/goals/${goalId}`,{ withCredentials: true });
             alert("Goal deleted successfully");
             navigate("/goals");
         } catch (err) {
+            if (err.response?.status === 401) {
+                window.location.href = err.response.data.redirect;
+            }
             console.error("Error deleting goal:", err);
             alert("Something went wrong while deleting");
         }
