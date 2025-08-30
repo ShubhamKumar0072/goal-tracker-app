@@ -13,7 +13,7 @@ const ensureAuth = require("./middleware");
 
 
 const corsOption = {
-  origin: ["http://localhost:5173"],
+  origin: [process.env.FRONTEND_URL],
   credentials: true
 }
 app.use(cors(corsOption));
@@ -62,7 +62,7 @@ app.use(passport.session());
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: 'http://localhost:8080/auth/google/callback'
+  callbackURL: `${process.env.BACKEND_URL}/auth/google/callback`
 },
   async (accessToken, refreshToken, profile, done) => {
     try {
@@ -89,21 +89,21 @@ app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'em
 app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
-    res.redirect('http://localhost:5173/dashboard'); // or wherever you want
+    res.redirect(`${process.env.FRONTEND_URL}/dashboard`); // or wherever you want
   }
 );
 
 // 🚪 Logout route
 app.get('/logout', (req, res) => {
   req.logout(() => {
-    res.redirect('http://localhost:5173'); // redirect to homepage after logout
+    res.redirect(process.env.FRONTEND_URL); // redirect to homepage after logout
   });
 });
 
 // 🚪 Login route
 app.get('/login', (req, res) => {
   req.logout(() => {
-    res.redirect('http://localhost:5173/singUpLogin'); // redirect to homepage after logout
+    res.redirect(`${process.env.FRONTEND_URL}/singUpLogin`); // redirect to homepage after logout
   });
 });
 
