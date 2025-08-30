@@ -11,11 +11,39 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const findOrCreateUser = require('./util/findOrCreateUser');
 const ensureAuth = require("./middleware");
 
+const store = MongoStore.create({
+  mongoUrl: dbURL,
+  crypto: {
+    secret: process.env.SECRET,
+  },
+  touchAfter: 24 * 3600,
+});
 
-const corsOption = {
-  origin: process.env.FRONTEND_URL,
+store.on("error",()=>{
+    console.log("error in session store:",err);
+});
+
+const corsOptions = {
+  origin: "https://goal-tracker-app-frontend.onrender.com", // exact frontend domain
   credentials: true
-}
+};
+app.use(cors(corsOptions));
+
+app.use(session({
+  store,
+  secret: process.env.SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production", // true on Render
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000
+  }
+}));
+
+
+
 app.use(cors(corsOption));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -30,32 +58,6 @@ async function main() {
   await mongoose.connect(dbURL);
 }
 
-const store = MongoStore.create({
-  mongoUrl: dbURL,
-  crypto: {
-    secret: process.env.SECRET,
-  },
-  touchAfter: 24 * 3600,
-});
-
-store.on("error",()=>{
-    console.log("error in session store:",err);
-});
-
-//setup session
-app.use(session({
-  store,
-  secret: process.env.SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    httpOnly: true,
-    secure:true,
-    sameSite: "none"
-  },
-}));
 
 //setup passport
 app.use(passport.initialize());
