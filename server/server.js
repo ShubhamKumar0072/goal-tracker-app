@@ -8,28 +8,29 @@ const passport = require("passport");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const findOrCreateUser = require('./util/findOrCreateUser');
+const findOrCreateUser = require("./util/findOrCreateUser");
 const ensureAuth = require("./middleware");
 
-
+// ---------- CORS CONFIG ----------
 const corsOption = {
-  origin: process.env.FRONTEND_URL,
+  origin: process.env.FRONTEND_URL, // your frontend URL (Render)
   credentials: true
-}
+};
 app.use(cors(corsOption));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-//Database SetUp
+// ---------- DATABASE SETUP ----------
 const dbURL = process.env.ATLASDB_URL;
-main().then(() => {
-  console.log("Successfully Connected1");
-})
-  .catch((err) => console.log(err));
+main()
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => console.error(err));
+
 async function main() {
   await mongoose.connect(dbURL);
 }
 
+// ---------- SESSION STORE ----------
 const store = MongoStore.create({
   mongoUrl: dbURL,
   crypto: {
@@ -38,34 +39,36 @@ const store = MongoStore.create({
   touchAfter: 24 * 3600,
 });
 
-store.on("error",()=>{
-    console.log("error in session store:",err);
+store.on("error", (err) => {
+  console.error("❌ Error in session store:", err);
 });
 
-//setup session
+// ---------- SESSION SETUP ----------
+app.set("trust proxy", 1); // important for secure cookies on render
+
 app.use(session({
   store,
   secret: process.env.SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
-    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     httpOnly: true,
-    secure:true,
-    sameSite: "none"
+    secure: process.env.NODE_ENV === "production", // only set Secure in prod
+    sameSite: "none" // needed for cross-origin cookies
   },
 }));
 
-//setup passport
+// ---------- PASSPORT SETUP ----------
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: `${process.env.BACKEND_URL}/auth/google/callback`
-},
+passport.use(new GoogleStrategy(
+  {
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: `${process.env.BACKEND_URL}/auth/google/callback`,
+  },
   async (accessToken, refreshToken, profile, done) => {
     try {
       const user = await findOrCreateUser(profile);
@@ -73,7 +76,8 @@ passport.use(new GoogleStrategy({
     } catch (err) {
       done(err, null);
     }
-  }));
+  }
+));
 
 passport.serializeUser((user, done) => {
   done(null, user.id); // store MongoDB _id in session
@@ -84,32 +88,34 @@ passport.deserializeUser(async (id, done) => {
   done(null, user);
 });
 
-// 🔐 Login route
+// ---------- ROUTES ----------
+
+// 🔐 Login with Google
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-// 🔄 Callback route
-app.get('/auth/google/callback',
+// 🔄 Google callback
+app.get(
+  '/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
-    res.redirect(`${process.env.FRONTEND_URL}/dashboard`); // or wherever you want
+    res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
   }
 );
 
-// 🚪 Logout route
-app.get('/logout', (req, res) => {
-  req.logout(() => {
-    res.redirect(process.env.FRONTEND_URL); // redirect to homepage after logout
+// 🚪 Logout
+app.get('/logout', (req, res, next) => {
+  req.logout(function (err) {
+    if (err) return next(err);
+    res.redirect(process.env.FRONTEND_URL);
   });
 });
 
-// 🚪 Login route
+// 🚪 Login redirect (failure)
 app.get('/login', (req, res) => {
-  req.logout(() => {
-    res.redirect(`${process.env.FRONTEND_URL}/singUpLogin`); // redirect to homepage after logout
-  });
+  res.redirect(`${process.env.FRONTEND_URL}/singUpLogin`);
 });
 
-//Check Login
+// ✅ Check login
 app.get("/check-login", (req, res) => {
   if (req.isAuthenticated()) {
     res.send({ loggedIn: true, user: req.user });
@@ -118,13 +124,7 @@ app.get("/check-login", (req, res) => {
   }
 });
 
-
-
-
-
-
-
-
+// ---------- YOUR APP ROUTES ----------
 const goal = require("./routes/goals");
 app.use("/goals", goal);
 
@@ -134,11 +134,8 @@ app.use("/tasks", task);
 const dash = require("./routes/dash");
 app.use("/dash", dash);
 
-
-
-
-
-
-app.listen(8080, () => {
-  console.log("server started on port 8080");
-})
+// ---------- SERVER START ----------
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
