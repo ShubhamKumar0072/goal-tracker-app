@@ -11,6 +11,16 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const findOrCreateUser = require('./util/findOrCreateUser');
 const ensureAuth = require("./middleware");
 
+//Database SetUp
+const dbURL = process.env.ATLASDB_URL;
+main().then(() => {
+  console.log("Successfully Connected1");
+})
+  .catch((err) => console.log(err));
+async function main() {
+  await mongoose.connect(dbURL);
+}
+
 const store = MongoStore.create({
   mongoUrl: dbURL,
   crypto: {
@@ -47,16 +57,6 @@ app.use(session({
 app.use(cors(corsOption));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-//Database SetUp
-const dbURL = process.env.ATLASDB_URL;
-main().then(() => {
-  console.log("Successfully Connected1");
-})
-  .catch((err) => console.log(err));
-async function main() {
-  await mongoose.connect(dbURL);
-}
 
 
 //setup passport
