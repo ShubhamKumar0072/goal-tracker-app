@@ -72,7 +72,7 @@ export default function DailyTask() {
         }
         try {
             let date2 = toUTCStartOfDay(date);
-            const response = await axios.post(`http://localhost:8080/tasks?date=${date2.toISOString()}`, data,{ withCredentials: true });
+            const response = await axios.post(`https://goal-tracker-app-backend-3tnq.onrender.com/tasks?date=${date2.toISOString()}`, data,{ withCredentials: true });
             console.log("Success:", response.data);
             setNewTask("");
             setDiff(5);
@@ -110,7 +110,7 @@ export default function DailyTask() {
         const dateUTC = toUTCStartOfDay(date).toISOString();
 
         try {
-            const response = await axios.put(`http://localhost:8080/tasks?date=${dateUTC}`, {
+            const response = await axios.put(`https://goal-tracker-app-backend-3tnq.onrender.com/tasks?date=${dateUTC}`, {
                 tasks: data.tasks.map(task => ({
                     taskName: task.taskName,
                     diff: task.diff,
