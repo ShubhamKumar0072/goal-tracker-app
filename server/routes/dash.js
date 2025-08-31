@@ -160,7 +160,7 @@ router.get("/bargraph-months",ensureAuth, async (req, res) => {
 });
 
 
-//Last 180 days Data
+//Last 60 days Data
 router.get("/pie-chart",ensureAuth, async (req, res) => {
   try {
     let today = new Date();
@@ -169,7 +169,7 @@ router.get("/pie-chart",ensureAuth, async (req, res) => {
     let mid = 0;
     const userId = req.user._id;
 
-    for (let i = 179; i >= 0; i--) {
+    for (let i = 59; i >= 0; i--) {
       let date = new Date(today);
       date.setDate(today.getDate() - i);
       date = toUTCStartOfDay(date);
