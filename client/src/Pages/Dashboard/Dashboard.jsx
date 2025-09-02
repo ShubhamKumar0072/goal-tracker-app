@@ -12,7 +12,7 @@ let text1 = "Manage today’s tasks with checkboxes and add new ones for today o
 let text2 = "Easily add new goals and keep track of all your progress in one organized view. Stay focused, stay consistent."
 
 let today = new Date();
-let monthName = today.toLocaleString('default', { month: 'short' }); // "Aug"
+let monthName = today.toLocaleString('en-US', { month: 'short' }); // "Aug"
 // Previous month
 let prevMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
 let prevMonthName = prevMonthDate.toLocaleString('default', { month: 'short' }); // e.g., "Jul"
