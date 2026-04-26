@@ -42,7 +42,8 @@ export default function GoalEdit() {
     async function handleSubmit(event) {
         event.preventDefault();
         try {
-            const response = await axios.put(`https://goal-tracker-app-backend-3tnq.onrender.com/goals/${goalId}`, formData, { withCredentials: true });
+            const baseUrl = import.meta.env.VITE_BACKEND_URL;
+            const response = await axios.put(`${baseUrl}/goals/${goalId}`, formData, { withCredentials: true });
             //console.log("Update response:", response.data);
             navigate("/one-goal", { state: { goalId: goalId } })
         } catch (err) {

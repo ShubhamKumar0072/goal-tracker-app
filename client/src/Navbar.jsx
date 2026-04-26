@@ -2,7 +2,7 @@ import { useState } from "react";
 import LinkButton from "./Components/Buttons/LinkButton";
 import "./Navbar.css";
 import MenuIcon from '@mui/icons-material/Menu';
-import useFetch from "./hooks/useFetch"; // Make sure this import is correct
+import useFetch from "./hooks/useFetch";
 
 export default function Navbar() {
     const [open, setOpen] = useState(false);
@@ -27,15 +27,21 @@ export default function Navbar() {
                     <li className="nav-items"> <LinkButton text="Home" link="/" /> </li>
                     <li className="nav-items"> <LinkButton text="DashBoard" link="/dashboard" /> </li>
                     <li className="nav-items"> <LinkButton text="Guide" link="/guide" /> </li>
-                    {!data?.loggedIn && (
-                        <li className="nav-items">
-                            <LinkButton text="SignUp/Login" link="/singUpLogin" />
-                        </li>
-                    )}
-                    {data?.loggedIn && (
-                        <li className="nav-items">
-                            <LinkButton text="Logout" link="/logout" />
-                        </li>
+                    {loading ? (
+                        <li className="nav-items">Loading...</li> //Put a loding button here
+                    ):(
+                        <>
+                            {!data?.loggedIn && (
+                                <li className="nav-items">
+                                    <LinkButton text="SignUp/Login" link="/singUpLogin" />
+                                </li>
+                            )}
+                            {data?.loggedIn && (
+                                <li className="nav-items">
+                                    <LinkButton text="Logout" link="/logout" />
+                                </li>
+                            )}
+                        </> 
                     )}
                 </ul>
             </div>

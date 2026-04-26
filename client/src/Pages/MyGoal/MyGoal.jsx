@@ -9,7 +9,7 @@ export default function MyGoal(){
     const navigate = useNavigate();
 
     const{data,loading,error} = useFetch("/goals");
-    if(loading) return (<h1>Looding ....</h1>);
+    if(loading) return (<h1>Loading ....</h1>);
     if(error) return(<h1>Error : {error.message} </h1>);
 
 

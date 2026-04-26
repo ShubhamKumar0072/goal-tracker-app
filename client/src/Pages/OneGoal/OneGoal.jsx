@@ -15,12 +15,13 @@ export default function OneGoal() {
     const navigate = useNavigate();
 
     const { data, loading, error } = useFetch(`/goals/${goalId}`);
-    if (loading) return (<h1>Looding ....</h1>);
+    if (loading) return (<h1>Loading ....</h1>);
     if (error) return (<h1>Error : {error.message} </h1>);
 
     async function handleDelete() {
         try {
-            await axios.delete(`https://goal-tracker-app-backend-3tnq.onrender.com/goals/${goalId}`,{ withCredentials: true });
+            const baseUrl = import.meta.env.VITE_BACKEND_URL;
+            await axios.delete(`${baseUrl}/goals/${goalId}`,{ withCredentials: true });
             alert("Goal deleted successfully");
             navigate("/goals");
         } catch (err) {

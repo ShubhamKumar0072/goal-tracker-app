@@ -1,6 +1,8 @@
 import "./SignUpLogin.css";
 import LinkButton from "../../Components/Buttons/LinkButton";
 
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
 // filepath: c:\1.My Files\Programing\Projects\goal-tracker-app\client\src\Pages\SignUpLogin\SignUpLogin.jsx
 export default function SignUpLogin() {
     return (
@@ -12,7 +14,7 @@ export default function SignUpLogin() {
                     Sign up or log in to get started!
                 </p>
                 <LinkButton
-                    link="https://goal-tracker-app-backend-3tnq.onrender.com/auth/google"
+                    link={`${backendUrl}/auth/google`}
                     text="Continue With Google"
                     bc="#4285F4"
                     col="#fff"

@@ -6,7 +6,7 @@ const COLORS = ["#4CAF50", "#FF9800", "#E53935"];
 
 function OneGoalPie({ goalId }) {
     const { data, loading, error } = useFetch(`/goals/${goalId}/piechart`);
-    if (loading) return (<h1>Looding ....</h1>);
+    if (loading) return (<h1>Loading....</h1>);
     if (error) return (<h1>Error : {error.message} </h1>);
     return (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "1.5rem" }}>

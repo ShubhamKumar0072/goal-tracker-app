@@ -6,7 +6,8 @@ import axios from "axios";
 export default function OneTask({ onEdit, label,desc, isDone, taskId, date, goal, onDelete }) {
     async function handleDeleteClick() {
         try {
-            const response = await axios.delete(`https://goal-tracker-app-backend-3tnq.onrender.com/tasks/${taskId}?date=${new Date(date).toISOString()}`,{ withCredentials: true });
+            const baseUrl = import.meta.env.VITE_BACKEND_URL;
+            const response = await axios.delete(`${baseUrl}/tasks/${taskId}?date=${new Date(date).toISOString()}`,{ withCredentials: true });
             console.log("Deleted:", response.data);
             if (onDelete) onDelete(); // trigger parent refresh
         } catch (err) {

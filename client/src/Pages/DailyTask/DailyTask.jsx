@@ -24,13 +24,13 @@ function toUTCStartOfDay(localDate) {
 export default function DailyTask() {
     const [date, setDate] = useState(new Date());
     const [data, setData] = useState(null);
-
+    const baseUrl = import.meta.env.VITE_BACKEND_URL;
 
     //Function to access Data
     async function fetchTasks() {
         try {
             const date2 = toUTCStartOfDay(date);
-            const response = await axios.get(`https://goal-tracker-app-backend-3tnq.onrender.com/tasks?date=${date2.toISOString()}`, { withCredentials: true });
+            const response = await axios.get(`${baseUrl}/tasks?date=${date2.toISOString()}`, { withCredentials: true });
             setData(response.data);
         } catch (err) {
             if (err.response?.status === 401) {
@@ -72,7 +72,8 @@ export default function DailyTask() {
         }
         try {
             let date2 = toUTCStartOfDay(date);
-            const response = await axios.post(`https://goal-tracker-app-backend-3tnq.onrender.com/tasks?date=${date2.toISOString()}`, data,{ withCredentials: true });
+            const baseUrl = import.meta.env.VITE_BACKEND_URL;
+            const response = await axios.post(`${baseUrl}/tasks?date=${date2.toISOString()}`, data,{ withCredentials: true });
             console.log("Success:", response.data);
             setNewTask("");
             setDiff(5);
@@ -110,7 +111,8 @@ export default function DailyTask() {
         const dateUTC = toUTCStartOfDay(date).toISOString();
 
         try {
-            const response = await axios.put(`https://goal-tracker-app-backend-3tnq.onrender.com/tasks?date=${dateUTC}`, {
+            const baseUrl = import.meta.env.VITE_BACKEND_URL;
+            const response = await axios.put(`${baseUrl}/tasks?date=${dateUTC}`, {
                 tasks: data.tasks.map(task => ({
                     taskName: task.taskName,
                     diff: task.diff,

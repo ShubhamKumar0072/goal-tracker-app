@@ -9,7 +9,8 @@ export default function LogOut() {
   const [confirm, setConfirm] = useState(false);
 
   function handleLogout() {
-    window.location.href = "https://goal-tracker-app-backend-3tnq.onrender.com/logout";
+    const baseUrl = import.meta.env.VITE_BACKEND_URL;
+    window.location.href = `${baseUrl}/logout`;
   }
 
   function handleCancel() {
